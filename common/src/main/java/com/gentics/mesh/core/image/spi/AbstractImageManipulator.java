@@ -7,6 +7,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.imageio.ImageIO;
 
@@ -36,6 +37,8 @@ public abstract class AbstractImageManipulator implements ImageManipulator {
 		this.vertx = vertx;
 		this.options = options;
 	}
+	
+	private static AtomicInteger imgCounter = new AtomicInteger(0);
 
 	@Override
 	public File getCacheFile(String sha512sum, ImageManipulationParameters parameters) {
@@ -51,7 +54,7 @@ public abstract class AbstractImageManipulator implements ImageManipulator {
 		if (!baseFolder.exists()) {
 			baseFolder.mkdirs();
 		}
-		File cacheFile = new File(baseFolder, "image-" + parameters.getCacheKey() + ".jpg");
+		File cacheFile = new File(baseFolder, "image-" + imgCounter.getAndIncrement() + ".jpg");
 		if (log.isDebugEnabled()) {
 			log.debug("Using cache file {" + cacheFile + "}");
 		}

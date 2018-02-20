@@ -2,6 +2,7 @@ package com.gentics.mesh.image;
 
 import static com.gentics.mesh.core.rest.error.Errors.error;
 import static io.netty.handler.codec.http.HttpResponseStatus.BAD_REQUEST;
+import static io.netty.handler.codec.http.HttpResponseStatus.INTERNAL_SERVER_ERROR;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -16,6 +17,8 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
@@ -44,6 +47,8 @@ import io.vertx.reactivex.core.WorkerExecutor;
  * The ImgScalr Manipulator uses a pure java imageio image resizer.
  */
 public class ImgscalrImageManipulator extends AbstractImageManipulator {
+	
+	private final Logger logger = LoggerFactory.getLogger(ImgscalrImageManipulator.class);
 
 	private FocalPointModifier focalPointModifier = new FocalPointModifier();
 
@@ -141,9 +146,9 @@ public class ImgscalrImageManipulator extends AbstractImageManipulator {
 		File cacheFile = getCacheFile(cacheKey, parameters);
 
 		// Check the cache file directory
-		if (cacheFile.exists()) {
-			return PropReadFileStream.openFile(this.vertx, cacheFile.getAbsolutePath());
-		}
+//		if (cacheFile.exists()) {
+//			return PropReadFileStream.openFile(this.vertx, cacheFile.getAbsolutePath());
+//		}
 
 		// TODO handle execution timeout
 		// Make sure to run that code in the dedicated thread pool it may be CPU intensive for larger images and we don't want to exhaust the regular worker
@@ -197,6 +202,11 @@ public class ImgscalrImageManipulator extends AbstractImageManipulator {
 				if (!omitResize) {
 					rgbCopy = resizeIfRequested(rgbCopy, parameters);
 				}
+				
+				boolean imageIsBlack = isImageBlack(rgbCopy);
+				if (imageIsBlack) {
+					logger.error("Resizing caused a completely black image.");
+				}
 
 				// Write image
 				try {
@@ -204,11 +214,27 @@ public class ImgscalrImageManipulator extends AbstractImageManipulator {
 				} catch (Exception e) {
 					throw error(BAD_REQUEST, "image_error_writing_failed", e);
 				}
+				
+				if (imageIsBlack) {
+					throw error(INTERNAL_SERVER_ERROR, "image_error_writing_failed", new RuntimeException("Resizing caused a completely black image."));
+				}
+				
 				// Return buffer to written cache file
 				return PropReadFileStream.openFile(this.vertx, cacheFile.getAbsolutePath());
 			}).subscribe(result -> bh.complete(result), bh::fail);
 		});
 
+	}
+	
+	public static boolean isImageBlack(BufferedImage image) {
+		int blackColor = Color.BLACK.getRGB();
+		int[] pixels = image.getRGB(0, 0, image.getWidth(), image.getHeight(), null, 0, image.getWidth());
+		for (int pixel : pixels) {
+			if (pixel != blackColor) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/**
