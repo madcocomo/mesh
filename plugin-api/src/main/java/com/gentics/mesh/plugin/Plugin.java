@@ -1,8 +1,8 @@
 package com.gentics.mesh.plugin;
 
-import org.osgi.framework.BundleActivator;
+import io.vertx.core.Verticle;
 
-public interface Plugin extends BundleActivator {
+public interface Plugin extends Verticle {
 
 	String getName();
 

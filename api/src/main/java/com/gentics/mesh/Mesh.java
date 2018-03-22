@@ -70,8 +70,9 @@ public interface Mesh {
 	 * deploy mandatory verticles and extensions.
 	 * 
 	 * @throws Exception
+	 * @return Fluent API
 	 */
-	void run() throws Exception;
+	Mesh run() throws Exception;
 
 	/**
 	 * Start mesh
@@ -79,8 +80,9 @@ public interface Mesh {
 	 * @param block
 	 *            Whether or not to block the further execution. This is useful if you want to run mesh from a main method
 	 * @throws Exception
+	 * @return Fluent API
 	 */
-	void run(boolean block) throws Exception;
+	Mesh run(boolean block) throws Exception;
 
 	/**
 	 * Return the vertx instance for mesh.
@@ -120,5 +122,7 @@ public interface Mesh {
 	static String getPlainVersion() {
 		return MeshVersion.getPlainVersion();
 	}
+
+	void dontExit() throws InterruptedException;
 
 }

@@ -2,11 +2,6 @@ package com.gentics.mesh.plugin;
 
 import java.io.File;
 import java.io.InputStream;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.ServiceLoader;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -14,18 +9,14 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.apache.commons.io.IOUtils;
-import org.osgi.framework.Bundle;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.BundleException;
-import org.osgi.framework.Constants;
-import org.osgi.framework.ServiceReference;
-import org.osgi.framework.launch.Framework;
-import org.osgi.framework.launch.FrameworkFactory;
 
+import com.gentics.mesh.Mesh;
 import com.gentics.mesh.etc.config.MeshOptions;
 import com.gentics.mesh.json.JsonUtil;
 import com.gentics.mesh.plugin.manager.api.PluginManager;
 
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 
@@ -40,39 +31,11 @@ public class PluginManagerImpl implements PluginManager {
 
 	private String pluginFolder;
 
-	private Framework framework;
-
 	@Inject
 	public PluginManagerImpl() {
 	}
 
 	public void init(MeshOptions options) {
-		try {
-			this.framework = startFramework();
-		} catch (BundleException e) {
-			log.error("Error while starting OSGi framework", e);
-		}
-
-		BundleContext context = framework.getBundleContext();
-
-		List<Bundle> installedBundles = new LinkedList<Bundle>();
-
-		try {
-			// installedBundles.add(context.installBundle("file:org.apache.felix.shell-1.4.3.jar"));
-			// installedBundles.add(context.installBundle("file:org.apache.felix.shell.tui-1.4.1.jar"));
-
-			installedBundles.add(context.installBundle("file:mesh-hello-world-plugin-0.18.0-SNAPSHOT.jar"));
-			for (Bundle bundle : installedBundles) {
-				bundle.start();
-				ServiceReference<Plugin> ref = bundle.getBundleContext().getServiceReference(Plugin.class);
-				Plugin plugin = bundle.getBundleContext().getService(ref);
-				System.out.println("Plugin" + plugin.getName());
-			}
-
-		} catch (BundleException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
 
 		// this.pluginFolder = options.getPluginDirectory();
 		// try {
@@ -88,34 +51,7 @@ public class PluginManagerImpl implements PluginManager {
 		// }
 	}
 
-	private Framework startFramework() throws BundleException {
-		FrameworkFactory frameworkFactory = ServiceLoader.load(
-			FrameworkFactory.class).iterator().next();
-		Map<String, String> config = new HashMap<String, String>();
-		StringBuilder frameworkPackages = new StringBuilder();
-		frameworkPackages.append("com.gentics.mesh.plugin.rest,");
-		frameworkPackages.append("io.vertx.core;version=3.5.1,");
-		frameworkPackages.append("io.vertx.core.http;version=3.5.1,");
-		frameworkPackages.append("io.vertx.ext.web;version=3.5.1,");
-		frameworkPackages.append("com.fasterxml.jackson.annotation;version=2.9.0");
-		config.put(Constants.FRAMEWORK_SYSTEMPACKAGES_EXTRA, frameworkPackages.toString());
-		Framework framework = frameworkFactory.newFramework(config);
-		framework.start();
-		BundleContext context = framework.getBundleContext();
-		context.addBundleListener(b -> {
-			System.out.println("Bundle: " + b.getType());
-		});
-		context.addServiceListener(event -> {
-			System.out.println("Event" + event.getType());
-			System.out.println("Type: " + event.getSource().getClass().getName());
-			// Plugin manager = (PluginManager) context.getService(event.getServiceReference());
-			// manager.registerPlugin(this);
-		});
-		return framework;
-	}
-
-	@Override
-	public void registerPlugin(Plugin plugin) {
+	private void registerPlugin(Plugin plugin) {
 		System.out.println("REGISTER Plugin " + plugin.getName());
 	}
 
@@ -154,6 +90,16 @@ public class PluginManagerImpl implements PluginManager {
 			log.error("Error while loading plugin from file {" + file + "}", e);
 		}
 
+	}
+
+	@Override
+	public void deployPlugin(String mavenCoordinates, Handler<AsyncResult<String>> completionHandler) {
+		Mesh.mesh().getVertx().deployVerticle("maven:" + mavenCoordinates, completionHandler);
+	}
+
+	@Override
+	public void deployPlugin(Plugin plugin) {
+		Mesh.mesh().getVertx().deployVerticle(plugin);
 	}
 
 }

@@ -4,16 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 
-import org.osgi.framework.BundleActivator;
-import org.osgi.framework.BundleContext;
-
 import com.gentics.mesh.plugin.Plugin;
 import com.gentics.mesh.plugin.PluginManifest;
+
+import io.vertx.core.AbstractVerticle;
 
 /**
  * Abstract implementation for a Gentics Mesh plugin.
  */
-public abstract class AbstractPlugin implements Plugin, BundleActivator {
+public abstract class AbstractPlugin extends AbstractVerticle implements Plugin {
 
 	private PluginManifest manifest;
 
@@ -29,12 +28,6 @@ public abstract class AbstractPlugin implements Plugin, BundleActivator {
 	public void setManifest(PluginManifest manifest) {
 		this.manifest = manifest;
 	}
-
-	@Override
-	public abstract void start(BundleContext context) throws Exception;
-
-	@Override
-	public abstract void stop(BundleContext context) throws Exception;
 
 	public List<Callable<RestExtension>> getExtensions() {
 		return endpoints;
