@@ -7,6 +7,7 @@ import static com.gentics.mesh.test.ClientHelper.call;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.TimeZone;
 import java.util.Vector;
 
 import com.gentics.mesh.core.data.schema.SchemaContainer;
@@ -379,7 +380,9 @@ public class GraphQLEndpointTest extends AbstractMeshTest {
 	}
 
 	private long dateToMilis(String date) throws ParseException {
-		return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(date).getTime();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        simpleDateFormat.setTimeZone(TimeZone.getTimeZone("GMT+2"));
+        return simpleDateFormat.parse(date).getTime();
 	}
 
 	private Completable createLanguageLinkResolvingNode(String parentUuid, String referencedUuid) throws Exception {

@@ -110,6 +110,27 @@
 
 	<profiles>
 		<profile>
+            <id>fasterTest</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<configuration>
+                            <excludedGroups>com.gentics.mesh.test.Integration</excludedGroups>
+                            <excludes>
+                                <exclude>com.gentics.mesh.graphdb.orientdb.**</exclude>
+                                <exclude>com.gentics.mesh.distributed.**</exclude>
+                            </excludes>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<profile>
 			<id>inclusions</id>
 			<build>
 				<plugins>

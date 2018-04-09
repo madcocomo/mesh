@@ -51,7 +51,9 @@ import io.vertx.core.logging.LoggerFactory;
 import io.vertx.core.logging.SLF4JLogDelegateFactory;
 import io.vertx.ext.web.RoutingContext;
 import okhttp3.OkHttpClient;
+import org.junit.experimental.categories.Category;
 
+@Category(com.gentics.mesh.test.Integration.class)
 public abstract class AbstractMeshTest implements TestHelperMethods, TestHttpMethods {
 
 	static {

@@ -260,7 +260,8 @@ public class MeshDockerServer extends GenericContainer<MeshDockerServer> {
 
 			// We need to keep the uid of the docker container env and the local test execution env in sync to be able to access the data of the mounted volume.
 			int uid = UnixUtils.getUid();
-			dockerFile = dockerFile.replace("%UID%", String.valueOf(uid));
+			//dockerFile = dockerFile.replace("%UID%", String.valueOf(uid)); //comment out to avoid uid out of range error on Mac host
+			dockerFile = dockerFile.replace("%UID%", "1000");
 			dockerFile = dockerFile.replace("%CMD%", generateCommand(classPathArg));
 			dockerImage.withFileFromString("Dockerfile", dockerFile);
 

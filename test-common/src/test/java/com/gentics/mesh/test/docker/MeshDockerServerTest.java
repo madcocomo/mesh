@@ -9,12 +9,15 @@ import org.junit.Test;
 import com.gentics.mesh.core.rest.user.UserListResponse;
 
 import io.vertx.core.Vertx;
+import org.junit.experimental.categories.Category;
 
+@Category(com.gentics.mesh.test.Integration.class)
 public class MeshDockerServerTest {
 
 	@ClassRule
 	public static MeshDockerServer server = new MeshDockerServer("gentics/mesh:0.17.0", Vertx.vertx())
 		.withDebug(9200)
+        .withFilesystem()
 		.waitForStartup();
 
 	@Test
