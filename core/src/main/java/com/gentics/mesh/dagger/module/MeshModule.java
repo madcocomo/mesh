@@ -126,14 +126,7 @@ public class MeshModule {
 	@Singleton
 	public static BodyHandlerImpl bodyHandler() {
 		String tempDirectory = Mesh.mesh().getOptions().getUploadOptions().getTempDirectory();
-		BodyHandlerImpl handler = new MeshBodyHandlerImpl(tempDirectory);
-		handler.setBodyLimit(Mesh.mesh().getOptions().getUploadOptions().getByteLimit());
-		// TODO check for windows issues
-		handler.setUploadsDirectory(tempDirectory);
-		handler.setMergeFormAttributes(false);
-		handler.setDeleteUploadedFilesOnEnd(true);
-		return handler;
+		long byteLimit = Mesh.mesh().getOptions().getUploadOptions().getByteLimit();
+		return new MeshBodyHandlerImpl(tempDirectory, byteLimit);
 	}
-
-
 }

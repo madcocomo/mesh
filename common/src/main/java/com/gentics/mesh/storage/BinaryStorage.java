@@ -1,7 +1,5 @@
 package com.gentics.mesh.storage;
 
-import com.gentics.mesh.core.data.node.field.BinaryGraphField;
-
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.vertx.core.buffer.Buffer;
@@ -22,12 +20,13 @@ public interface BinaryStorage {
 	Completable store(Flowable<Buffer> stream, String uuid);
 
 	/**
-	 * Checks whether the binary data for the given field exists
+	 * Checks whether the data by that UUID exists
 	 * 
-	 * @param binaryField
+	 * @param uuid UUID of the binary
+	 *
 	 * @return
 	 */
-	boolean exists(BinaryGraphField field);
+	boolean exists(String uuid);
 
 	/**
 	 * Read the binary data which is identified by the given binary uuid.

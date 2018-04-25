@@ -8,6 +8,7 @@ import com.gentics.mesh.parameter.impl.PagingParametersImpl;
 import com.gentics.mesh.parameter.impl.PublishParametersImpl;
 import com.gentics.mesh.parameter.impl.RolePermissionParametersImpl;
 import com.gentics.mesh.parameter.impl.SchemaUpdateParametersImpl;
+import com.gentics.mesh.parameter.impl.UploadParametersImpl;
 import com.gentics.mesh.parameter.impl.UserParametersImpl;
 import com.gentics.mesh.parameter.impl.VersioningParametersImpl;
 
@@ -50,6 +51,10 @@ public interface ParameterProviderContext extends ActionContext {
 
 	default SchemaUpdateParameters getSchemaUpdateParameters() {
 		return new SchemaUpdateParametersImpl(this);
+	}
+	
+	default UploadParameters getUploadParameters() {
+		return new UploadParametersImpl(this);
 	}
 
 }

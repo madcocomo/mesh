@@ -11,7 +11,6 @@ import com.gentics.mesh.core.data.job.impl.JobRootImpl;
 import com.gentics.mesh.core.data.job.impl.MicronodeMigrationJobImpl;
 import com.gentics.mesh.core.data.job.impl.NodeMigrationJobImpl;
 import com.gentics.mesh.core.data.job.impl.ReleaseMigrationJobImpl;
-import com.gentics.mesh.core.data.node.field.impl.BinaryGraphFieldImpl;
 import com.gentics.mesh.core.data.node.field.impl.MicronodeGraphFieldImpl;
 import com.gentics.mesh.core.data.node.field.list.impl.BooleanGraphFieldListImpl;
 import com.gentics.mesh.core.data.node.field.list.impl.DateGraphFieldListImpl;
@@ -48,6 +47,8 @@ import com.gentics.mesh.core.data.schema.impl.SchemaContainerVersionImpl;
 import com.gentics.mesh.core.data.schema.impl.UpdateFieldChangeImpl;
 import com.gentics.mesh.core.data.schema.impl.UpdateMicroschemaChangeImpl;
 import com.gentics.mesh.core.data.schema.impl.UpdateSchemaChangeImpl;
+import com.gentics.mesh.core.data.xml.impl.XmlImpl;
+import com.gentics.mesh.core.data.xml.impl.XmlRootImpl;
 import com.gentics.mesh.graphdb.spi.Database;
 
 import io.vertx.core.logging.Logger;
@@ -101,6 +102,10 @@ public final class DatabaseHelper {
 		// Binary
 		BinaryImpl.init(database);
 		BinaryRootImpl.init(database);
+		
+		// XML
+		XmlImpl.init(database);
+		XmlRootImpl.init(database);
 
 		// Nodes
 		ProjectImpl.init(database);
@@ -116,7 +121,6 @@ public final class DatabaseHelper {
 		HtmlGraphFieldListImpl.init(database);
 		NodeGraphFieldListImpl.init(database);
 		MicronodeGraphFieldListImpl.init(database);
-		BinaryGraphFieldImpl.init(database);
 
 		LanguageImpl.init(database);
 		GroupImpl.init(database);

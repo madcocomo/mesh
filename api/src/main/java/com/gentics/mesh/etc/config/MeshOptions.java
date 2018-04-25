@@ -37,7 +37,7 @@ public class MeshOptions implements Option {
 	@JsonProperty(required = false)
 	@JsonPropertyDescription("Turn on or off the update checker.")
 	@EnvironmentVariable(name = MESH_UPDATECHECK_ENV, description = "Override the configured updatecheck flag.")
-	private boolean updateCheck = true;
+	private boolean updateCheck = false;
 
 	@JsonProperty(required = true)
 	@JsonPropertyDescription("Http server options.")

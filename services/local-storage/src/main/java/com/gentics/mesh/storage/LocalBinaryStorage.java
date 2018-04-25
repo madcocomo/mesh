@@ -10,7 +10,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import com.gentics.mesh.Mesh;
-import com.gentics.mesh.core.data.node.field.BinaryGraphField;
 import com.gentics.mesh.etc.config.MeshUploadOptions;
 import com.gentics.mesh.util.RxUtil;
 
@@ -76,8 +75,7 @@ public class LocalBinaryStorage extends AbstractBinaryStorage {
 	}
 
 	@Override
-	public boolean exists(BinaryGraphField field) {
-		String uuid = field.getBinary().getUuid();
+	public boolean exists(String uuid) {
 		return new File(getFilePath(uuid)).exists();
 	}
 

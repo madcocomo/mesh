@@ -18,6 +18,7 @@ import com.gentics.mesh.cli.BootstrapInitializer;
 import com.gentics.mesh.context.InternalActionContext;
 import com.gentics.mesh.context.impl.InternalRoutingActionContextImpl;
 import com.gentics.mesh.core.rest.navigation.NavigationResponse;
+import com.gentics.mesh.parameter.UploadParameters;
 import com.gentics.mesh.parameter.impl.DeleteParametersImpl;
 import com.gentics.mesh.parameter.impl.ImageManipulationParametersImpl;
 import com.gentics.mesh.parameter.impl.NavigationParametersImpl;
@@ -25,6 +26,7 @@ import com.gentics.mesh.parameter.impl.NodeParametersImpl;
 import com.gentics.mesh.parameter.impl.PagingParametersImpl;
 import com.gentics.mesh.parameter.impl.PublishParametersImpl;
 import com.gentics.mesh.parameter.impl.RolePermissionParametersImpl;
+import com.gentics.mesh.parameter.impl.UploadParametersImpl;
 import com.gentics.mesh.parameter.impl.VersioningParametersImpl;
 import com.gentics.mesh.rest.EndpointRoute;
 import com.gentics.mesh.router.route.AbstractProjectEndpoint;
@@ -42,16 +44,20 @@ public class NodeEndpoint extends AbstractProjectEndpoint {
 	private Resource resource = new Resource();
 
 	private BinaryFieldHandler binaryFieldHandler;
+	
+	private XmlFieldHandler xmlFieldHandler;
 
 	public NodeEndpoint() {
 		super("nodes", null);
 	}
 
 	@Inject
-	public NodeEndpoint(BootstrapInitializer boot, NodeCrudHandler crudHandler, BinaryFieldHandler fieldAPIHandler) {
+	public NodeEndpoint(BootstrapInitializer boot, NodeCrudHandler crudHandler, BinaryFieldHandler fieldAPIHandler, 
+		XmlFieldHandler xmlFieldHandler) {
 		super("nodes", boot);
 		this.crudHandler = crudHandler;
 		this.binaryFieldHandler = fieldAPIHandler;
+		this.xmlFieldHandler = xmlFieldHandler;
 	}
 
 	@Override
@@ -76,6 +82,7 @@ public class NodeEndpoint extends AbstractProjectEndpoint {
 		addTagsHandler();
 		addMoveHandler();
 		addBinaryHandlers();
+		addXmlHandlers();
 		addLanguageHandlers();
 		addNavigationHandlers();
 		addPublishHandlers();
@@ -140,7 +147,7 @@ public class NodeEndpoint extends AbstractProjectEndpoint {
 			InternalActionContext ac = new InternalRoutingActionContextImpl(rc);
 			binaryFieldHandler.handleUpdateField(ac, uuid, fieldName, attributes);
 		}, false);
-
+		
 		EndpointRoute imageTransform = createEndpoint();
 		imageTransform.path("/:nodeUuid/binaryTransform/:fieldName");
 		imageTransform.addUriParameter("nodeUuid", "Uuid of the node.", UUIDUtil.randomUUID());
@@ -163,16 +170,52 @@ public class NodeEndpoint extends AbstractProjectEndpoint {
 		fieldGet.addUriParameter("fieldName", "Name of the binary field", "image");
 		fieldGet.addQueryParameters(ImageManipulationParametersImpl.class);
 		fieldGet.method(GET);
-		fieldGet.description(
-				"Download the binary field with the given name. You can use image query parameters for crop and resize if the binary data represents an image.");
+		fieldGet.description("Download the binary field with the given name. "
+			+ "You can use image query parameters for crop and resize if the binary data represents an image.");
 		fieldGet.handler(rc -> {
 			String uuid = rc.request().getParam("nodeUuid");
 			String fieldName = rc.request().getParam("fieldName");
 			binaryFieldHandler.handleReadBinaryField(rc, uuid, fieldName);
 		});
-
 	}
-
+	
+	private void addXmlHandlers() {
+		// GET /(node)/xml/(field name).
+		EndpointRoute fieldGet = createEndpoint();
+		fieldGet.path("/:nodeUuid/xml/:fieldName");
+		fieldGet.addUriParameter("nodeUuid", "Node UUID", UUIDUtil.randomUUID());
+		fieldGet.addUriParameter("fieldName", "Name of the XML field", "content");
+		fieldGet.method(GET);
+		fieldGet.description("Download the content of the XML field with the given name.");
+		fieldGet.handler(rc -> {
+			String uuid = rc.request().getParam("nodeUuid");
+			String fieldName = rc.request().getParam("fieldName");
+			xmlFieldHandler.handleGet(rc, uuid, fieldName);
+		});
+		
+		// POST /(node)/xml/(field name)?lang=(language)&ver=(version).
+		EndpointRoute fieldUpload = createEndpoint();
+		fieldUpload.path("/:nodeUuid/xml/:fieldName");
+		fieldUpload.addUriParameter("nodeUuid", "Node UUID", UUIDUtil.randomUUID());
+		fieldUpload.addUriParameter("fieldName", "Name of the XML field", "content");
+		fieldUpload.addQueryParameters(UploadParametersImpl.class);
+		fieldUpload.method(POST);
+		fieldUpload.produces(APPLICATION_JSON);
+		fieldUpload.exampleRequest("(arbitrary XML binary stream)");
+		fieldUpload.exampleResponse(OK, nodeExamples.getNodeResponseWithAllFields(), "The response contains the updated node.");
+		fieldUpload.description("Update the specified XML field of the given name");
+		fieldUpload.blockingHandler(rc -> {
+			String uuid = rc.request().getParam("nodeUuid");
+			String fieldName = rc.request().getParam("fieldName");
+			InternalActionContext ac = new InternalRoutingActionContextImpl(rc);
+			UploadParameters uploadParameters = ac.getUploadParameters();
+			String language = uploadParameters.getLanguage();
+			String version = uploadParameters.getVersion();
+			// Get the uploaded file from either buffered content.
+			xmlFieldHandler.handlePost(rc, uuid, fieldName, language, version);
+		});
+	}
+	
 	private void addMoveHandler() {
 		EndpointRoute endpoint = createEndpoint();
 		endpoint.path("/:nodeUuid/moveTo/:toUuid");

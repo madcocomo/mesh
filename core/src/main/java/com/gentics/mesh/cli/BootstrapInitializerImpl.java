@@ -62,6 +62,7 @@ import com.gentics.mesh.core.data.root.impl.MeshRootImpl;
 import com.gentics.mesh.core.data.schema.SchemaContainer;
 import com.gentics.mesh.core.data.search.IndexHandler;
 import com.gentics.mesh.core.data.service.ServerSchemaStorage;
+import com.gentics.mesh.core.data.xml.XmlRoot;
 import com.gentics.mesh.core.rest.schema.BinaryFieldSchema;
 import com.gentics.mesh.core.rest.schema.HtmlFieldSchema;
 import com.gentics.mesh.core.rest.schema.SchemaModel;
@@ -595,6 +596,11 @@ public class BootstrapInitializerImpl implements BootstrapInitializer {
 	@Override
 	public BinaryRoot binaryRoot() {
 		return meshRoot().getBinaryRoot();
+	}
+	
+	@Override
+	public XmlRoot xmlRoot() {
+		return meshRoot().getXmlRoot();
 	}
 
 	@Override

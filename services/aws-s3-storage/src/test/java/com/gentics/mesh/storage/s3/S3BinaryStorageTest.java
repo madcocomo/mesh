@@ -6,12 +6,8 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.wait.Wait;
-
-import com.gentics.mesh.core.data.binary.Binary;
-import com.gentics.mesh.core.data.node.field.BinaryGraphField;
 
 import io.reactivex.Flowable;
 import io.vertx.core.Vertx;
@@ -50,13 +46,10 @@ public class S3BinaryStorageTest {
 
 	@Test
 	public void testStore() {
-		BinaryGraphField mockField = Mockito.mock(BinaryGraphField.class);
-		Binary binary = Mockito.mock(Binary.class);
-		Mockito.when(mockField.getBinary()).thenReturn(binary);
-		Mockito.when(binary.getSHA512Sum()).thenReturn("test");
+		String uuid = "test";
 //		assertFalse(storage.exists(mockField));
 		storage.store(Flowable.just(Buffer.buffer("test")), "test").blockingAwait();
-		assertTrue(storage.exists(mockField));
+		assertTrue(storage.exists(uuid));
 		storage.read("test").ignoreElements().blockingAwait();
 	}
 

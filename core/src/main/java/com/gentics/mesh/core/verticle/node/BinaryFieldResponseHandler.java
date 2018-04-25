@@ -47,12 +47,12 @@ public class BinaryFieldResponseHandler {
 	 * @param binaryField
 	 */
 	public void handle(RoutingContext rc, BinaryGraphField binaryField) {
-		if (!storage.exists(binaryField)) {
+		Binary binary = binaryField.getBinary();
+		if (!storage.exists(binary.getUuid())) {
 			rc.fail(error(NOT_FOUND, "node_error_binary_data_not_found"));
 			return;
 		} else {
 			InternalActionContext ac = new InternalRoutingActionContextImpl(rc);
-			Binary binary = binaryField.getBinary();
 			String contentLength = String.valueOf(binary.getSize());
 			String fileName = binaryField.getFileName();
 			String contentType = binaryField.getMimeType();

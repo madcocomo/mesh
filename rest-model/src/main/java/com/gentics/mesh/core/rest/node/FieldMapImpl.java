@@ -30,6 +30,7 @@ import com.gentics.mesh.core.rest.node.field.NodeField;
 import com.gentics.mesh.core.rest.node.field.NodeFieldListItem;
 import com.gentics.mesh.core.rest.node.field.NumberField;
 import com.gentics.mesh.core.rest.node.field.StringField;
+import com.gentics.mesh.core.rest.node.field.XmlField;
 import com.gentics.mesh.core.rest.node.field.impl.BinaryFieldImpl;
 import com.gentics.mesh.core.rest.node.field.impl.BooleanFieldImpl;
 import com.gentics.mesh.core.rest.node.field.impl.DateFieldImpl;
@@ -37,6 +38,7 @@ import com.gentics.mesh.core.rest.node.field.impl.HtmlFieldImpl;
 import com.gentics.mesh.core.rest.node.field.impl.NodeFieldImpl;
 import com.gentics.mesh.core.rest.node.field.impl.NumberFieldImpl;
 import com.gentics.mesh.core.rest.node.field.impl.StringFieldImpl;
+import com.gentics.mesh.core.rest.node.field.impl.XmlFieldImpl;
 import com.gentics.mesh.core.rest.node.field.list.FieldList;
 import com.gentics.mesh.core.rest.node.field.list.MicronodeFieldList;
 import com.gentics.mesh.core.rest.node.field.list.NodeFieldList;
@@ -91,6 +93,8 @@ public class FieldMapImpl implements FieldMap {
 				return (T) transformStringFieldJsonNode(jsonNode, key);
 			case BINARY:
 				return (T) transformBinaryFieldJsonNode(jsonNode, key);
+			case XML:
+				return (T) transformXmlFieldJsonNode(jsonNode, key);
 			case NUMBER:
 				return (T) transformNumberFieldJsonNode(jsonNode, key);
 			case BOOLEAN:
@@ -373,6 +377,13 @@ public class FieldMapImpl implements FieldMap {
 		}
 		return JsonUtil.getMapper().treeToValue(jsonNode, BinaryFieldImpl.class);
 	}
+	
+	private XmlField transformXmlFieldJsonNode(JsonNode jsonNode, String key) throws JsonProcessingException {
+		if (jsonNode.isPojo()) {
+			return pojoNodeToValue(jsonNode, XmlField.class, key);
+		}
+		return JsonUtil.getMapper().treeToValue(jsonNode, XmlFieldImpl.class);
+	}
 
 	private StringField transformStringFieldJsonNode(JsonNode jsonNode, String key) throws JsonProcessingException {
 		// Unwrap stored pojos
@@ -454,6 +465,11 @@ public class FieldMapImpl implements FieldMap {
 	@Override
 	public BinaryField getBinaryField(String key) {
 		return getField(key, FieldTypes.BINARY);
+	}
+	
+	@Override
+	public XmlField getXmlField(String key) {
+		return getField(key, FieldTypes.XML);
 	}
 
 	@Override

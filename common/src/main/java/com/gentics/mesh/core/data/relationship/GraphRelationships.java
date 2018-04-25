@@ -144,6 +144,9 @@ public class GraphRelationships {
 	// Asset root
 	public static final String HAS_BINARY_ROOT = "HAS_BINARY_ROOT";
 	public static final String HAS_BINARY = "HAS_BINARY";
+	
+	public static final String HAS_XML_ROOT = "HAS_XML_ROOT";
+	public static final String HAS_XML = "HAS_XML";
 
 	public static final String HAS_FIELD = "HAS_FIELD";
 	public static final String HAS_ITEM = "HAS_ITEM";

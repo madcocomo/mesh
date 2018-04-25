@@ -12,6 +12,7 @@ import static com.gentics.mesh.core.data.relationship.GraphRelationships.HAS_SCH
 import static com.gentics.mesh.core.data.relationship.GraphRelationships.HAS_TAGFAMILY_ROOT;
 import static com.gentics.mesh.core.data.relationship.GraphRelationships.HAS_TAG_ROOT;
 import static com.gentics.mesh.core.data.relationship.GraphRelationships.HAS_USER_ROOT;
+import static com.gentics.mesh.core.data.relationship.GraphRelationships.HAS_XML_ROOT;
 import static com.gentics.mesh.core.rest.error.Errors.error;
 import static io.netty.handler.codec.http.HttpResponseStatus.BAD_REQUEST;
 import static io.netty.handler.codec.http.HttpResponseStatus.NOT_FOUND;
@@ -41,6 +42,8 @@ import com.gentics.mesh.core.data.root.SchemaContainerRoot;
 import com.gentics.mesh.core.data.root.TagFamilyRoot;
 import com.gentics.mesh.core.data.root.TagRoot;
 import com.gentics.mesh.core.data.root.UserRoot;
+import com.gentics.mesh.core.data.xml.XmlRoot;
+import com.gentics.mesh.core.data.xml.impl.XmlRootImpl;
 import com.gentics.mesh.dagger.MeshInternal;
 import com.gentics.mesh.graphdb.spi.Database;
 
@@ -69,6 +72,7 @@ public class MeshRootImpl extends MeshVertexImpl implements MeshRoot {
 	private static MicroschemaContainerRoot microschemaContainerRoot;
 	private static JobRoot jobRoot;
 	private static BinaryRoot binaryRoot;
+	private static XmlRoot xmlRoot;
 
 	public static void init(Database database) {
 		database.addVertexType(MeshRootImpl.class, MeshVertexImpl.class);
@@ -111,6 +115,25 @@ public class MeshRootImpl extends MeshVertexImpl implements MeshRoot {
 			}
 		}
 		return binaryRoot;
+	}
+	
+	@Override
+	public XmlRoot getXmlRoot() {
+		if (xmlRoot == null) {
+			synchronized (MeshRootImpl.class) {
+				XmlRoot foundXmlRoot = out(HAS_XML_ROOT).nextOrDefaultExplicit(XmlRootImpl.class, null);
+				if (foundXmlRoot == null) {
+					xmlRoot = getGraph().addFramedVertex(XmlRootImpl.class);
+					linkOut(xmlRoot, HAS_XML_ROOT);
+					if (log.isInfoEnabled()) {
+						log.info("Created XML root {" + xmlRoot.getUuid() + "}");
+					}
+				} else {
+					xmlRoot = foundXmlRoot;
+				}
+			}
+		}
+		return xmlRoot;
 	}
 
 	@Override
@@ -333,6 +356,7 @@ public class MeshRootImpl extends MeshVertexImpl implements MeshRoot {
 		MeshRootImpl.nodeRoot = null;
 		MeshRootImpl.tagRoot = null;
 		MeshRootImpl.binaryRoot = null;
+		MeshRootImpl.xmlRoot = null;
 
 		MeshRootImpl.userRoot = null;
 		MeshRootImpl.groupRoot = null;
@@ -343,7 +367,6 @@ public class MeshRootImpl extends MeshVertexImpl implements MeshRoot {
 		MeshRootImpl.microschemaContainerRoot = null;
 		MeshRootImpl.languageRoot = null;
 		MeshRootImpl.jobRoot = null;
-
 	}
 
 	@Override

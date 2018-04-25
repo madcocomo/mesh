@@ -19,6 +19,7 @@ import com.gentics.mesh.core.data.root.SchemaContainerRoot;
 import com.gentics.mesh.core.data.root.TagFamilyRoot;
 import com.gentics.mesh.core.data.root.TagRoot;
 import com.gentics.mesh.core.data.root.UserRoot;
+import com.gentics.mesh.core.data.xml.XmlRoot;
 import com.gentics.mesh.error.MeshSchemaException;
 import com.gentics.mesh.etc.MeshCustomLoader;
 import com.gentics.mesh.etc.config.MeshOptions;
@@ -79,6 +80,8 @@ public interface BootstrapInitializer {
 	 * @return
 	 */
 	BinaryRoot binaryRoot();
+	
+	XmlRoot xmlRoot();
 
 	/**
 	 * Return the global tagfamily root element. Note that each project has their own tag family root element.

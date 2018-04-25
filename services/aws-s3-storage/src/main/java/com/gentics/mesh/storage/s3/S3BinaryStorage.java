@@ -7,7 +7,6 @@ import java.util.concurrent.ExecutionException;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 
-import com.gentics.mesh.core.data.node.field.BinaryGraphField;
 import com.gentics.mesh.storage.AbstractBinaryStorage;
 
 import io.netty.buffer.ByteBuf;
@@ -28,7 +27,6 @@ import software.amazon.awssdk.services.s3.model.CreateBucketResponse;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
-import software.amazon.awssdk.services.s3.model.HeadObjectResponse;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 public class S3BinaryStorage extends AbstractBinaryStorage {
@@ -99,11 +97,11 @@ public class S3BinaryStorage extends AbstractBinaryStorage {
 	}
 
 	@Override
-	public boolean exists(BinaryGraphField field) {
-		String id = field.getBinary().getSHA512Sum();
+	public boolean exists(String uuid) {
+		String id = uuid;
 		// NoSuchKeyException
 		try {
-			HeadObjectResponse headResponse = client.headObject(HeadObjectRequest.builder()
+			client.headObject(HeadObjectRequest.builder()
 				.bucket(options.getBucketName())
 				.key(id)
 				.build()).get();

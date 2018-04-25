@@ -21,17 +21,12 @@ import com.gentics.mesh.core.rest.node.field.image.FocalPoint;
 import com.gentics.mesh.core.rest.node.field.image.Point;
 import com.gentics.mesh.core.rest.node.field.impl.BinaryFieldImpl;
 import com.gentics.mesh.dagger.MeshInternal;
-import com.gentics.mesh.graphdb.spi.Database;
 import com.gentics.mesh.handler.ActionContext;
 
 /**
  * @see BinaryGraphField
  */
 public class BinaryGraphFieldImpl extends MeshEdgeImpl implements BinaryGraphField {
-
-	public static void init(Database database) {
-		// database.addVertexType(BinaryGraphFieldImpl.class, MeshVertexImpl.class);
-	}
 
 	public static FieldTransformer<BinaryField> BINARY_TRANSFORMER = (container, ac, fieldKey, fieldSchema, languageTags, level, parentNode) -> {
 		BinaryGraphField graphBinaryField = container.getBinary(fieldKey);

@@ -155,6 +155,7 @@ public class MicronodeImpl extends AbstractGraphFieldContainerImpl implements Mi
 		FieldTypes type = FieldTypes.valueByName(fieldSchema.getType());
 		switch (type) {
 		case BINARY:
+		case XML:
 		case MICRONODE:
 			throw error(BAD_REQUEST, "error_unsupported_fieldtype", type.name());
 		case LIST:
@@ -187,6 +188,7 @@ public class MicronodeImpl extends AbstractGraphFieldContainerImpl implements Mi
 		FieldTypes type = FieldTypes.valueByName(fieldSchema.getType());
 		switch (type) {
 		case BINARY:
+		case XML:
 		case MICRONODE:
 			throw error(BAD_REQUEST, "error_unsupported_fieldtype", type.name());
 		case LIST:

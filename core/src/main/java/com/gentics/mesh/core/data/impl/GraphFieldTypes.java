@@ -18,6 +18,7 @@ import com.gentics.mesh.core.data.node.field.impl.MicronodeGraphFieldImpl;
 import com.gentics.mesh.core.data.node.field.impl.NodeGraphFieldImpl;
 import com.gentics.mesh.core.data.node.field.impl.NumberGraphFieldImpl;
 import com.gentics.mesh.core.data.node.field.impl.StringGraphFieldImpl;
+import com.gentics.mesh.core.data.node.field.impl.XmlGraphFieldImpl;
 import com.gentics.mesh.core.data.node.field.list.impl.BooleanGraphFieldListImpl;
 import com.gentics.mesh.core.data.node.field.list.impl.DateGraphFieldListImpl;
 import com.gentics.mesh.core.data.node.field.list.impl.HtmlGraphFieldListImpl;
@@ -79,7 +80,9 @@ public enum GraphFieldTypes {
 			NodeGraphFieldListImpl.NODE_LIST_GETTER),
 
 	BINARY("binary", BinaryGraphFieldImpl.BINARY_TRANSFORMER, BinaryGraphFieldImpl.BINARY_UPDATER,
-			BinaryGraphFieldImpl.BINARY_GETTER);
+			BinaryGraphFieldImpl.BINARY_GETTER),
+	
+	XML("xml", XmlGraphFieldImpl.TRANSFORMER, XmlGraphFieldImpl.UPDATER, XmlGraphFieldImpl.GETTER);
 
 	private String combinedType;
 	private FieldTransformer transformer;

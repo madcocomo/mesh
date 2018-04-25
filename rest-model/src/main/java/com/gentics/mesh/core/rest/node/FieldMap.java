@@ -11,6 +11,7 @@ import com.gentics.mesh.core.rest.micronode.MicronodeResponse;
 import com.gentics.mesh.core.rest.node.field.BinaryField;
 import com.gentics.mesh.core.rest.node.field.Field;
 import com.gentics.mesh.core.rest.node.field.NodeField;
+import com.gentics.mesh.core.rest.node.field.XmlField;
 import com.gentics.mesh.core.rest.node.field.impl.BooleanFieldImpl;
 import com.gentics.mesh.core.rest.node.field.impl.DateFieldImpl;
 import com.gentics.mesh.core.rest.node.field.impl.HtmlFieldImpl;
@@ -109,6 +110,8 @@ public interface FieldMap extends RestModel {
 	 * @return
 	 */
 	BinaryField getBinaryField(String fieldKey);
+	
+	XmlField getXmlField(String fieldKey);
 
 	/**
 	 * Return the boolean field with the given key.

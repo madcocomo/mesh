@@ -36,57 +36,6 @@ public class OptionsLoaderTest {
 	}
 
 	@Test
-	public void testApplyEnvs() throws Exception {
-		Map<String, String> envMap = new HashMap<>();
-		envMap.put(MeshOptions.MESH_DEFAULT_LANG_ENV, "ru");
-		envMap.put(MeshOptions.MESH_UPDATECHECK_ENV, "false");
-		envMap.put(HttpServerConfig.MESH_HTTP_PORT_ENV, "8100");
-		envMap.put(ElasticSearchOptions.MESH_ELASTICSEARCH_URL_ENV, "https://somewhere.com");
-		envMap.put(MeshOptions.MESH_CLUSTER_INIT_ENV, "true");
-		envMap.put(HttpServerConfig.MESH_HTTP_CORS_ORIGIN_PATTERN_ENV, "*");
-		envMap.put(HttpServerConfig.MESH_HTTP_CORS_ENABLE_ENV, "true");
-		set(envMap);
-		MeshOptions options = OptionsLoader.createOrloadOptions();
-		assertEquals(8100, options.getHttpServerOptions().getPort());
-		assertEquals("ru", options.getDefaultLanguage());
-		assertFalse(options.isUpdateCheckEnabled());
-		assertEquals("https://somewhere.com", options.getSearchOptions().getUrl());
-		assertTrue(options.isInitClusterMode());
-		assertTrue(options.getHttpServerOptions().getEnableCors());
-		assertEquals("*", options.getHttpServerOptions().getCorsAllowedOriginPattern());
-	}
-
-	@Test
-	public void testApplyEnvsNull() throws Exception {
-		Map<String, String> envMap = new HashMap<>();
-		envMap.put(ElasticSearchOptions.MESH_ELASTICSEARCH_URL_ENV, "null");
-		set(envMap);
-		MeshOptions options = OptionsLoader.createOrloadOptions();
-		assertNull(options.getSearchOptions().getUrl());
-	}
-
-	/**
-	 * Override the environment variables.
-	 * 
-	 * @param newenv
-	 * @throws Exception
-	 */
-	public static void set(Map<String, String> newenv) throws Exception {
-		Class[] classes = Collections.class.getDeclaredClasses();
-		Map<String, String> env = System.getenv();
-		for (Class cl : classes) {
-			if ("java.util.Collections$UnmodifiableMap".equals(cl.getName())) {
-				Field field = cl.getDeclaredField("m");
-				field.setAccessible(true);
-				Object obj = field.get(env);
-				Map<String, String> map = (Map<String, String>) obj;
-				map.clear();
-				map.putAll(newenv);
-			}
-		}
-	}
-
-	@Test
 	public void testApplyArgs() {
 		MeshOptions options = OptionsLoader.createOrloadOptions("-nodeName", "theNodeName", "-clusterName", "theClusterName");
 		assertEquals("The node name should have been specified.", "theNodeName", options.getNodeName());

@@ -268,7 +268,7 @@ public interface EndpointRoute extends Comparable<EndpointRoute> {
 	 * @param path
 	 */
 	EndpointRoute setRAMLPath(String path);
-
+	
 	/**
 	 * Add a query parameter provider to the endpoint. The query parameter provider will in turn provide examples, descriptions for all query parameters which
 	 * the parameter provider provides.

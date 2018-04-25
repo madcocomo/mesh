@@ -177,6 +177,15 @@ public class NodeContainerMappingProvider extends AbstractMappingProvider {
 			binaryProps.put("height", notAnalyzedType(LONG));
 			binaryProps.put("dominantColor", notAnalyzedType(KEYWORD));
 			break;
+		case XML:
+			fieldInfo.put("type", OBJECT);
+			JsonObject xmlProps = new JsonObject();
+			fieldInfo.put("properties", xmlProps);
+			xmlProps.put("checksum", notAnalyzedType(KEYWORD));
+			xmlProps.put("filename", notAnalyzedType(KEYWORD));
+			xmlProps.put("filesize", notAnalyzedType(LONG));
+			xmlProps.put("xmlSchemaName", notAnalyzedType(KEYWORD));
+			break;
 		case NUMBER:
 			// Note: Lucene does not support BigDecimal/Decimal. It is not possible to store such values. ES will fallback to string in those cases.
 			// The mesh json parser will not deserialize numbers into BigDecimal at this point. No need to check for big decimal is therefore needed.
