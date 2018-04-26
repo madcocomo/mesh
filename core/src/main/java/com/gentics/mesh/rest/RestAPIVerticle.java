@@ -28,6 +28,7 @@ import com.gentics.mesh.core.verticle.schema.SchemaEndpoint;
 import com.gentics.mesh.core.verticle.tagfamily.TagFamilyEndpoint;
 import com.gentics.mesh.core.verticle.user.UserEndpoint;
 import com.gentics.mesh.core.verticle.utility.UtilityEndpoint;
+import com.gentics.mesh.core.verticle.webdav.WebdavEndpoint;
 import com.gentics.mesh.core.verticle.webroot.WebRootEndpoint;
 import com.gentics.mesh.graphql.GraphQLEndpoint;
 import com.gentics.mesh.router.RouterStorage;
@@ -127,6 +128,9 @@ public class RestAPIVerticle extends AbstractVerticle {
 
 	@Inject
 	public Provider<AdminEndpoint> adminEndpoint;
+	
+	@Inject
+	public Provider<WebdavEndpoint> webdavEndpoint;
 
 	@Inject
 	public RestAPIVerticle() {
@@ -241,6 +245,7 @@ public class RestAPIVerticle extends AbstractVerticle {
 		endpoints.add(eventbusEndpoint.get());
 		endpoints.add(utilityEndpoint.get());
 		endpoints.add(projectInfoEndpoint.get());
+		endpoints.add(webdavEndpoint.get());
 
 		for (AbstractEndpoint endpoint : endpoints) {
 			endpoint.init(storage);
