@@ -41,19 +41,15 @@ public class MeshBodyHandlerImpl extends BodyHandlerImpl {
 		
 		// Use original behavior except for POST/PUT-ing XML and Zip content.
 		HttpMethod method = request.method();
+		if(method != HttpMethod.POST && method != HttpMethod.PUT) {
+            super.handle(context);
+            return;
+		}
+		
 		String contentType = request.getHeader(HttpHeaders.CONTENT_TYPE);
-		if (
-			!(
-				method == HttpMethod.POST
-				|| method == HttpMethod.PUT
-			) || !(
-				contentType.equals("text/xml") 
-				|| contentType.equals("application/xml") 
-				|| contentType.equals("application/zip")
-			)
-		) {
-			super.handle(context);
-			return;
+		if(null != contentType && !"text/xml".equals(contentType) && !"application/xml".equals(contentType) && !"application/zip".equals(contentType)) {
+            super.handle(context);
+            return;
 		}
 		
 		log.info("Using special request body handling for file upload of type {}", contentType);

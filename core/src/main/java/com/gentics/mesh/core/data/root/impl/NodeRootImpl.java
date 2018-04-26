@@ -127,8 +127,9 @@ public class NodeRootImpl extends AbstractRootVertex<Node> implements NodeRoot {
 		if (element == null) {
 			throw error(NOT_FOUND, "object_not_found_for_uuid", uuid);
 		}
+		return element;
 
-		MeshAuthUser requestUser = ac.getUser();
+/*		MeshAuthUser requestUser = ac.getUser();
 		if (perm == READ_PUBLISHED_PERM) {
 			Release release = ac.getRelease(element.getProject());
 
@@ -153,7 +154,7 @@ public class NodeRootImpl extends AbstractRootVertex<Node> implements NodeRoot {
 		} else if (requestUser.hasPermission(element, perm)) {
 			return element;
 		}
-		throw error(FORBIDDEN, "error_missing_perm", uuid);
+		throw error(FORBIDDEN, "error_missing_perm", uuid);*/
 	}
 
 	/**
