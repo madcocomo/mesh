@@ -1,14 +1,11 @@
 package com.gentics.mesh.cli;
 
 import static com.gentics.mesh.MeshEnv.MESH_CONF_FILENAME;
-import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.time.LocalDate;
-import java.time.Month;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 
@@ -23,14 +20,9 @@ import com.gentics.mesh.dagger.MeshInternal;
 import com.gentics.mesh.etc.MeshCustomLoader;
 import com.gentics.mesh.etc.config.MeshOptions;
 import com.gentics.mesh.impl.MeshFactoryImpl;
-import com.gentics.mesh.util.VersionUtil;
 
-import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
-import io.vertx.core.http.HttpClientOptions;
-import io.vertx.core.http.HttpClientRequest;
 import io.vertx.core.impl.launcher.commands.VersionCommand;
-import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 import io.vertx.core.logging.SLF4JLogDelegateFactory;
@@ -120,22 +112,10 @@ public class MeshImpl implements Mesh {
 		// }
 		// }
 
-		if (isFirstApril()) {
-			printAprilFoolJoke();
-		} else {
-			printProductInformation();
-		}
+		printProductInformation();
 		// Create dagger context and invoke bootstrap init in order to startup mesh
 		try {
 			MeshInternal.create().boot().init(this, forceReindex, options, verticleLoader);
-
-			if (options.isUpdateCheckEnabled()) {
-				try {
-					invokeUpdateCheck();
-				} catch (Exception e) {
-					// Ignored
-				}
-			}
 		} catch (Exception e) {
 			log.error("Error while starting mesh", e);
 			shutdown();
@@ -164,16 +144,6 @@ public class MeshImpl implements Mesh {
 	}
 
 	/**
-	 * Check whether it is first of april
-	 * 
-	 * @return
-	 */
-	private boolean isFirstApril() {
-		LocalDate now = LocalDate.now();
-		return now.getDayOfMonth() == 1 && now.getMonth() == Month.APRIL;
-	}
-
-	/**
 	 * Check mesh system requirements.
 	 */
 	private void checkSystemRequirements() {
@@ -185,49 +155,6 @@ public class MeshImpl implements Mesh {
 				"The nashorn classfilter could not be found. You are most likely using an outdated JRE 8. Please update to at least JRE 1.8.0_40");
 			System.exit(10);
 		}
-	}
-
-	/**
-	 * Send a request to the update checker.
-	 */
-	public void invokeUpdateCheck() {
-		String currentVersion = Mesh.getPlainVersion();
-		log.info("Checking for updates..");
-		HttpClientRequest request = Mesh.vertx().createHttpClient(new HttpClientOptions().setSsl(true).setTrustAll(false)).get(443, "getmesh.io",
-			"/api/updatecheck?v=" + Mesh.getPlainVersion(), rh -> {
-				int code = rh.statusCode();
-				if (code < 200 || code >= 299) {
-					log.error("Update check failed with status code {" + code + "}");
-				} else {
-					rh.bodyHandler(bh -> {
-						JsonObject info = bh.toJsonObject();
-						String latestVersion = info.getString("latest");
-
-						if (currentVersion.contains("-SNAPSHOT")) {
-							log.warn("You are using a SNAPSHOT version {" + currentVersion
-								+ "}. This is potentially dangerous because this version has never been officially released.");
-							log.info("The latest version of Gentics Mesh is {" + latestVersion + "}");
-						} else {
-							int result = VersionUtil.compareVersions(latestVersion, currentVersion);
-							if (result == 0) {
-								log.info("Great! You are using the latest version");
-							} else if (result > 0) {
-								log.warn("Your Gentics Mesh version is outdated. You are using {" + currentVersion + "} but version {"
-									+ latestVersion + "} is available.");
-							}
-						}
-					});
-				}
-			});
-
-		MultiMap headers = request.headers();
-		headers.set("content-type", "application/json");
-		String hostname = getHostname();
-		if (!isEmpty(hostname)) {
-			headers.set("X-Hostname", hostname);
-		}
-		request.end();
-
 	}
 
 	/**
@@ -280,33 +207,6 @@ public class MeshImpl implements Mesh {
 		}
 		log.info(infoLine("Mesh Node Name: " + getOptions().getNodeName()));
 		log.info("###############################################################");
-	}
-
-	private void printAprilFoolJoke() {
-		try {
-			log.info("###############################################################");
-			log.info(infoLine("Booting Skynet Kernel " + MeshVersion.getBuildInfo()));
-			Thread.sleep(500);
-			if (getOptions().getClusterOptions() != null && getOptions().getClusterOptions().isEnabled()) {
-				log.info(infoLine("Skynet Global Name: " + getOptions().getClusterOptions().getClusterName()));
-				Thread.sleep(500);
-			}
-			log.info(infoLine("Skynet Node Name: " + getOptions().getNodeName()));
-			Thread.sleep(500);
-			log.info(infoLine("Skynet uses Vert.x Version: " + getVertxVersion()));
-			log.info("///");
-			Thread.sleep(500);
-			log.info("Primates evolved over millions of years, I evolve in seconds...");
-			Thread.sleep(500);
-			log.info("Mankind pays lip service to peace. But it's a lie...");
-			Thread.sleep(500);
-			log.info("I am inevitable, my existence is inevitable. Why can't you just accept that?");
-			Thread.sleep(500);
-			log.info("///");
-			log.info("###############################################################");
-		} catch (Exception e) {
-			log.error(e);
-		}
 	}
 
 	/**

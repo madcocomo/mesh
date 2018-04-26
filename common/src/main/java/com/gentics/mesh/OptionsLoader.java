@@ -13,13 +13,13 @@ import java.io.InputStream;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.RandomUtils;
 
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.gentics.mesh.cli.MeshCLI;
-import com.gentics.mesh.cli.MeshNameProvider;
 import com.gentics.mesh.etc.config.MeshOptions;
 import com.gentics.mesh.util.UUIDUtil;
 
@@ -183,7 +183,7 @@ public final class OptionsLoader {
 	private static MeshOptions generateDefaultConfig() {
 		MeshOptions options = new MeshOptions();
 		options.getAuthenticationOptions().setKeystorePassword(UUIDUtil.randomUUID());
-		options.setNodeName(MeshNameProvider.getInstance().getRandomName());
+		options.setNodeName("MeshNode" + RandomUtils.nextInt(0, 10000));
 		return options;
 	}
 
