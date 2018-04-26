@@ -115,24 +115,33 @@ public class MeshAuthHandler extends AuthHandlerImpl implements JWTAuthHandler {
 	 */
 	private void handleJWTAuth(RoutingContext context) {
 
+		// Extract token from:
+		// 1) Query parameter "auth"
+		// 2) Cookie "mesh.token"
+		// 3) Header "Authorization"
+		String token = null;
+		
+		final HttpServerRequest request = context.request();
+		
+		// Try query param first.
+		token = request.getParam("auth");
+		
+		// Try cookie.
 		// Mesh accepts JWT tokens via the cookie as well in order to handle JWT even for regular HTTP Download requests (eg. non ajax requests (static file
 		// downloads)).
 		// Store the found token value into the authentication header value. This will effectively overwrite the AUTHORIZATION header value.
 		Cookie tokenCookie = context.getCookie(MeshAuthProvider.TOKEN_COOKIE_KEY);
-		if (tokenCookie != null) {
-			context.request().headers().set(AUTHORIZATION, "Bearer " + tokenCookie.getValue());
+		if (token == null && tokenCookie != null) {
+			token = tokenCookie.getValue();
 		}
 
-		final HttpServerRequest request = context.request();
-		String token = null;
-
-		// Try to load the token from the AUTHORIZATION header value
-		final String authorization = request.headers().get(AUTHORIZATION);
-		if (authorization != null) {
-			String[] parts = authorization.split(" ");
+		// Try to load the token from the cookie or AUTHORIZATION header.
+		final String authorizationHeader = request.headers().get(AUTHORIZATION);
+		if (token == null && authorizationHeader != null) {
+			String[] parts = authorizationHeader.split(" ");
 			if (parts.length == 2) {
 				final String scheme = parts[0], credentials = parts[1];
-
+				
 				if (BEARER.matcher(scheme).matches()) {
 					token = credentials;
 				}
@@ -141,11 +150,12 @@ public class MeshAuthHandler extends AuthHandlerImpl implements JWTAuthHandler {
 				context.fail(401);
 				return;
 			}
-		} else {
-			if (Mesh.mesh().getOptions().getAuthenticationOptions().isEnableAnonymousAccess()) {
-				if (log.isDebugEnabled()) {
-					log.debug("No Authorization header was found.");
-				}
+		}
+		
+		// If no token is found, use anonymous auth if enabled.
+		final boolean allowAnon = Mesh.mesh().getOptions().getAuthenticationOptions().isEnableAnonymousAccess();
+		if (token == null) {
+			if (allowAnon) {
 				// Check whether the Anonymous-Authentication header was set to disable. This will disable the anonymous authentication method altogether.
 				String anonymousAuthHeaderValue = request.headers().get(MeshHeaders.ANONYMOUS_AUTHENTICATION);
 				if ("disable".equals(anonymousAuthHeaderValue)) {
@@ -160,21 +170,18 @@ public class MeshAuthHandler extends AuthHandlerImpl implements JWTAuthHandler {
 					if (log.isDebugEnabled()) {
 						log.debug("No anonymous user and authorization header was found. Can't authenticate request.");
 					}
+					handle401(context);
+					return;
 				} else {
 					context.setUser(anonymousUser);
 					authorizeUser(anonymousUser, context);
 					return;
 				}
+			} else {
+				log.warn("No Authorization token value was found");
+				handle401(context);
+				return;
 			}
-			handle401(context);
-			return;
-		}
-
-		// Check whether an actual token value was found otherwise we can exit early
-		if (token == null) {
-			log.warn("No Authorization token value was found");
-			handle401(context);
-			return;
 		}
 
 		// 4. Authenticate the found token using JWT
