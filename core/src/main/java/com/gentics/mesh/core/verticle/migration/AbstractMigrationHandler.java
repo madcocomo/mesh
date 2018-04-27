@@ -17,20 +17,15 @@ import com.gentics.mesh.core.data.search.SearchQueue;
 import com.gentics.mesh.core.rest.common.FieldContainer;
 import com.gentics.mesh.core.rest.common.RestModel;
 import com.gentics.mesh.core.verticle.handler.AbstractHandler;
-import com.gentics.mesh.core.verticle.node.BinaryFieldHandler;
 import com.gentics.mesh.graphdb.spi.Database;
 import com.gentics.mesh.json.JsonUtil;
 import com.gentics.mesh.util.Tuple;
 
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 import jdk.nashorn.api.scripting.ClassFilter;
 import jdk.nashorn.api.scripting.NashornScriptEngineFactory;
 
 @SuppressWarnings("restriction")
-public abstract class AbstractMigrationHandler extends AbstractHandler implements MigrationHandler {
-
-	private static final Logger log = LoggerFactory.getLogger(AbstractMigrationHandler.class);
+public abstract class AbstractMigrationHandler extends AbstractHandler {
 
 	/**
 	 * Script engine factory.
@@ -41,12 +36,9 @@ public abstract class AbstractMigrationHandler extends AbstractHandler implement
 
 	protected SearchQueue searchQueue;
 
-	protected BinaryFieldHandler binaryFieldHandler;
-
-	public AbstractMigrationHandler(Database db, SearchQueue searchQueue, BinaryFieldHandler binaryFieldHandler) {
+	public AbstractMigrationHandler(Database db, SearchQueue searchQueue) {
 		this.db = db;
 		this.searchQueue = searchQueue;
-		this.binaryFieldHandler = binaryFieldHandler;
 	}
 
 	/**

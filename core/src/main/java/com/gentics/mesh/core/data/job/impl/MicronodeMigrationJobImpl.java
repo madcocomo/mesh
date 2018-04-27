@@ -1,17 +1,22 @@
 package com.gentics.mesh.core.data.job.impl;
 
+import static com.gentics.mesh.core.data.relationship.GraphRelationships.HAS_FROM_VERSION;
+import static com.gentics.mesh.core.data.relationship.GraphRelationships.HAS_TO_VERSION;
 import static com.gentics.mesh.core.rest.error.Errors.error;
 import static io.netty.handler.codec.http.HttpResponseStatus.BAD_REQUEST;
 
+import java.util.Map;
+
 import com.gentics.mesh.Mesh;
+import com.gentics.mesh.context.InternalActionContext;
 import com.gentics.mesh.core.data.Release;
+import com.gentics.mesh.core.data.container.impl.MicroschemaContainerVersionImpl;
 import com.gentics.mesh.core.data.generic.MeshVertexImpl;
+import com.gentics.mesh.core.data.job.JobStatusHandler;
 import com.gentics.mesh.core.data.release.ReleaseMicroschemaEdge;
 import com.gentics.mesh.core.data.schema.MicroschemaContainer;
 import com.gentics.mesh.core.data.schema.MicroschemaContainerVersion;
-import com.gentics.mesh.core.rest.admin.migration.MigrationType;
-import com.gentics.mesh.core.verticle.migration.MigrationStatusHandler;
-import com.gentics.mesh.core.verticle.migration.impl.MigrationStatusHandlerImpl;
+import com.gentics.mesh.core.rest.job.JobResponse;
 import com.gentics.mesh.dagger.DB;
 import com.gentics.mesh.dagger.MeshInternal;
 import com.gentics.mesh.graphdb.spi.Database;
@@ -27,14 +32,44 @@ public class MicronodeMigrationJobImpl extends JobImpl {
 	public static void init(Database database) {
 		database.addVertexType(MicronodeMigrationJobImpl.class, MeshVertexImpl.class);
 	}
+	
+	@Override
+	public JobResponse transformToRestSync(InternalActionContext ac, int level, String... languageTags) {
+		JobResponse response = super.transformToRestSync(ac, level, languageTags);
+		Map<String, String> props = response.getProperties();
+		if (getFromMicroschemaVersion() != null && getToMicroschemaVersion() != null) {
+			MicroschemaContainer container = getToMicroschemaVersion().getSchemaContainer();
+			props.put("microschemaName", container.getName());
+			props.put("microschemaUuid", container.getUuid());
+			props.put("fromVersion", getFromMicroschemaVersion().getVersion());
+			props.put("toVersion", getToMicroschemaVersion().getVersion());
+		}
+		return response;
+	}
 
 	@Override
 	public void prepare() {
 		// NOP
 	}
+	
+	public MicroschemaContainerVersion getFromMicroschemaVersion() {
+		return out(HAS_FROM_VERSION).has(MicroschemaContainerVersionImpl.class).nextOrDefaultExplicit(MicroschemaContainerVersionImpl.class, null);
+	}
+
+	public void setFromMicroschemaVersion(MicroschemaContainerVersion fromVersion) {
+		setUniqueLinkOutTo(fromVersion, HAS_FROM_VERSION);
+	}
+	
+	public MicroschemaContainerVersion getToMicroschemaVersion() {
+		return out(HAS_TO_VERSION).has(MicroschemaContainerVersionImpl.class).nextOrDefaultExplicit(MicroschemaContainerVersionImpl.class, null);
+	}
+
+	public void setToMicroschemaVersion(MicroschemaContainerVersion toVersion) {
+		setUniqueLinkOutTo(toVersion, HAS_TO_VERSION);
+	}
 
 	protected void processTask() {
-		MigrationStatusHandler statusHandler = new MigrationStatusHandlerImpl(this, Mesh.vertx(), MigrationType.microschema);
+		JobStatusHandler statusHandler = new JobStatusHandlerImpl(this, Mesh.vertx());
 		try {
 
 			try (Tx tx = DB.get().tx()) {

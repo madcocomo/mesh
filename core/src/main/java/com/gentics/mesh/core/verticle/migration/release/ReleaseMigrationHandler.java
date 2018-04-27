@@ -4,8 +4,8 @@ import static com.gentics.mesh.core.data.ContainerType.DRAFT;
 import static com.gentics.mesh.core.data.ContainerType.INITIAL;
 import static com.gentics.mesh.core.data.ContainerType.PUBLISHED;
 import static com.gentics.mesh.core.data.relationship.GraphRelationships.HAS_FIELD_CONTAINER;
-import static com.gentics.mesh.core.rest.admin.migration.MigrationStatus.RUNNING;
 import static com.gentics.mesh.core.rest.error.Errors.error;
+import static com.gentics.mesh.core.rest.job.JobStatus.RUNNING;
 import static io.netty.handler.codec.http.HttpResponseStatus.BAD_REQUEST;
 
 import javax.inject.Inject;
@@ -14,12 +14,11 @@ import javax.inject.Singleton;
 import com.gentics.mesh.core.data.Project;
 import com.gentics.mesh.core.data.Release;
 import com.gentics.mesh.core.data.impl.GraphFieldContainerEdgeImpl;
+import com.gentics.mesh.core.data.job.JobStatusHandler;
 import com.gentics.mesh.core.data.node.Node;
 import com.gentics.mesh.core.data.search.SearchQueue;
 import com.gentics.mesh.core.data.search.SearchQueueBatch;
 import com.gentics.mesh.core.verticle.migration.AbstractMigrationHandler;
-import com.gentics.mesh.core.verticle.migration.MigrationStatusHandler;
-import com.gentics.mesh.core.verticle.node.BinaryFieldHandler;
 import com.gentics.mesh.graphdb.spi.Database;
 
 import io.vertx.core.logging.Logger;
@@ -31,8 +30,8 @@ public class ReleaseMigrationHandler extends AbstractMigrationHandler {
 	private static final Logger log = LoggerFactory.getLogger(ReleaseMigrationHandler.class);
 
 	@Inject
-	public ReleaseMigrationHandler(Database db, SearchQueue searchQueue, BinaryFieldHandler nodeFieldAPIHandler) {
-		super(db, searchQueue, nodeFieldAPIHandler);
+	public ReleaseMigrationHandler(Database db, SearchQueue searchQueue) {
+		super(db, searchQueue);
 	}
 
 	/**
@@ -42,7 +41,7 @@ public class ReleaseMigrationHandler extends AbstractMigrationHandler {
 	 *            new release
 	 * @param status
 	 */
-	public void migrateRelease(Release newRelease, MigrationStatusHandler status) {
+	public void migrateRelease(Release newRelease, JobStatusHandler status) {
 		if (newRelease.isMigrated()) {
 			throw error(BAD_REQUEST, "Release {" + newRelease.getName() + "} is already migrated");
 		}

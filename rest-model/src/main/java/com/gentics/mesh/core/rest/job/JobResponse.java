@@ -5,8 +5,6 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
-import com.gentics.mesh.core.rest.admin.migration.MigrationStatus;
-import com.gentics.mesh.core.rest.admin.migration.MigrationType;
 import com.gentics.mesh.core.rest.common.AbstractResponse;
 import com.gentics.mesh.core.rest.user.UserReference;
 
@@ -33,11 +31,11 @@ public class JobResponse extends AbstractResponse {
 
 	@JsonProperty(required = true)
 	@JsonPropertyDescription("The type of the job.")
-	private MigrationType type;
+	private String type;
 
 	@JsonProperty(required = true)
 	@JsonPropertyDescription("Migration status.")
-	private MigrationStatus status;
+	private JobStatus status;
 
 	@JsonProperty(required = true)
 	@JsonPropertyDescription("Properties of the job.")
@@ -75,11 +73,11 @@ public class JobResponse extends AbstractResponse {
 		this.errorDetail = errorDetail;
 	}
 
-	public MigrationType getType() {
+	public String getType() {
 		return type;
 	}
 
-	public void setType(MigrationType type) {
+	public void setType(String type) {
 		this.type = type;
 	}
 
@@ -128,7 +126,7 @@ public class JobResponse extends AbstractResponse {
 	 * 
 	 * @return
 	 */
-	public MigrationStatus getStatus() {
+	public JobStatus getStatus() {
 		return status;
 	}
 
@@ -137,7 +135,7 @@ public class JobResponse extends AbstractResponse {
 	 * 
 	 * @param status
 	 */
-	public void setStatus(MigrationStatus status) {
+	public void setStatus(JobStatus status) {
 		this.status = status;
 	}
 

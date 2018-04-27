@@ -2,11 +2,11 @@ package com.gentics.mesh.core.data.job.impl;
 
 import static com.gentics.mesh.core.data.relationship.GraphPermission.READ_PERM;
 import static com.gentics.mesh.core.data.relationship.GraphRelationships.HAS_JOB;
-import static com.gentics.mesh.core.rest.admin.migration.MigrationStatus.COMPLETED;
-import static com.gentics.mesh.core.rest.admin.migration.MigrationStatus.FAILED;
-import static com.gentics.mesh.core.rest.admin.migration.MigrationStatus.QUEUED;
-import static com.gentics.mesh.core.rest.admin.migration.MigrationStatus.UNKNOWN;
 import static com.gentics.mesh.core.rest.error.Errors.error;
+import static com.gentics.mesh.core.rest.job.JobStatus.COMPLETED;
+import static com.gentics.mesh.core.rest.job.JobStatus.FAILED;
+import static com.gentics.mesh.core.rest.job.JobStatus.QUEUED;
+import static com.gentics.mesh.core.rest.job.JobStatus.UNKNOWN;
 import static io.netty.handler.codec.http.HttpResponseStatus.BAD_REQUEST;
 import static io.netty.handler.codec.http.HttpResponseStatus.INTERNAL_SERVER_ERROR;
 
@@ -29,8 +29,7 @@ import com.gentics.mesh.core.data.root.impl.AbstractRootVertex;
 import com.gentics.mesh.core.data.schema.MicroschemaContainerVersion;
 import com.gentics.mesh.core.data.schema.SchemaContainerVersion;
 import com.gentics.mesh.core.data.search.SearchQueueBatch;
-import com.gentics.mesh.core.rest.admin.migration.MigrationStatus;
-import com.gentics.mesh.core.rest.admin.migration.MigrationType;
+import com.gentics.mesh.core.rest.job.JobStatus;
 import com.gentics.mesh.dagger.DB;
 import com.gentics.mesh.graphdb.spi.Database;
 import com.gentics.mesh.parameter.PagingParameters;
@@ -98,7 +97,7 @@ public class JobRootImpl extends AbstractRootVertex<Job> implements JobRoot {
 	@Override
 	public Job enqueueSchemaMigration(User creator, Release release, SchemaContainerVersion fromVersion, SchemaContainerVersion toVersion) {
 		NodeMigrationJobImpl job = getGraph().addFramedVertex(NodeMigrationJobImpl.class);
-		job.setType(MigrationType.schema);
+		job.setType("schema");
 		job.setCreated(creator);
 		job.setRelease(release);
 		job.setStatus(QUEUED);
@@ -116,7 +115,7 @@ public class JobRootImpl extends AbstractRootVertex<Job> implements JobRoot {
 	public Job enqueueMicroschemaMigration(User creator, Release release, MicroschemaContainerVersion fromVersion,
 			MicroschemaContainerVersion toVersion) {
 		MicronodeMigrationJobImpl job = getGraph().addFramedVertex(MicronodeMigrationJobImpl.class);
-		job.setType(MigrationType.microschema);
+		job.setType("microschema");
 		job.setCreated(creator);
 		job.setRelease(release);
 		job.setStatus(QUEUED);
@@ -132,10 +131,11 @@ public class JobRootImpl extends AbstractRootVertex<Job> implements JobRoot {
 	}
 
 	@Override
-	public Job enqueueReleaseMigration(User creator, Release release, SchemaContainerVersion fromVersion, SchemaContainerVersion toVersion) {
-		Job job = getGraph().addFramedVertex(ReleaseMigrationJobImpl.class);
+	public Job enqueueReleaseMigration(User creator, Release release, 
+			SchemaContainerVersion fromVersion, SchemaContainerVersion toVersion) {
+		ReleaseMigrationJobImpl job = getGraph().addFramedVertex(ReleaseMigrationJobImpl.class);
 		job.setCreated(creator);
-		job.setType(MigrationType.release);
+		job.setType("release");
 		job.setRelease(release);
 		job.setStatus(QUEUED);
 		job.setFromSchemaVersion(fromVersion);
@@ -152,7 +152,7 @@ public class JobRootImpl extends AbstractRootVertex<Job> implements JobRoot {
 	public Job enqueueReleaseMigration(User creator, Release release) {
 		Job job = getGraph().addFramedVertex(ReleaseMigrationJobImpl.class);
 		job.setCreated(creator);
-		job.setType(MigrationType.release);
+		job.setType("release");
 		job.setStatus(QUEUED);
 		job.setRelease(release);
 		job.prepare();
@@ -207,7 +207,7 @@ public class JobRootImpl extends AbstractRootVertex<Job> implements JobRoot {
 		for (Job job : it) {
 			try {
 				// Don't execute failed or completed jobs again
-				MigrationStatus jobStatus = job.getStatus();
+				JobStatus jobStatus = job.getStatus();
 				if (job.hasFailed() || (jobStatus == COMPLETED || jobStatus == FAILED || jobStatus == UNKNOWN)) {
 					continue;
 				}

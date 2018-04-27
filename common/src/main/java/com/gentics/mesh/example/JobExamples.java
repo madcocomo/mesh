@@ -2,7 +2,6 @@ package com.gentics.mesh.example;
 
 import static com.gentics.mesh.util.UUIDUtil.randomUUID;
 
-import com.gentics.mesh.core.rest.admin.migration.MigrationType;
 import com.gentics.mesh.core.rest.job.JobListResponse;
 import com.gentics.mesh.core.rest.job.JobResponse;
 
@@ -20,7 +19,7 @@ public class JobExamples extends AbstractExamples {
 		response.setUuid(randomUUID());
 		response.setCreator(createUserReference());
 		response.setCreated(createTimestamp());
-		response.setType(MigrationType.release);
+		response.setType("release");
 		response.getProperties().put("releaseUuid", randomUUID());
 		response.getProperties().put("schemaUuid", randomUUID());
 		response.getProperties().put("fromVersion", "1.0");

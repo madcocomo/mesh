@@ -115,6 +115,7 @@ public class GraphRelationships {
 	public static final String HAS_JOB = "HAS_JOB";
 	public static final String HAS_TO_VERSION = "HAS_TO_VERSION";
 	public static final String HAS_FROM_VERSION = "HAS_FROM_VERSION";
+	public static final String HAS_ROOT_FOLDER_NODE = "HAS_ROOT_FOLDER_NODE";
 
 	/**
 	 * Edge type which is used to connect project and base node

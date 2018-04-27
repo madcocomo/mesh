@@ -9,12 +9,10 @@ import com.gentics.mesh.Mesh;
 import com.gentics.mesh.core.data.Project;
 import com.gentics.mesh.core.data.Release;
 import com.gentics.mesh.core.data.generic.MeshVertexImpl;
+import com.gentics.mesh.core.data.job.JobStatusHandler;
 import com.gentics.mesh.core.data.schema.SchemaContainerVersion;
 import com.gentics.mesh.core.data.search.SearchQueueBatch;
-import com.gentics.mesh.core.rest.admin.migration.MigrationType;
 import com.gentics.mesh.core.rest.schema.SchemaModel;
-import com.gentics.mesh.core.verticle.migration.MigrationStatusHandler;
-import com.gentics.mesh.core.verticle.migration.impl.MigrationStatusHandlerImpl;
 import com.gentics.mesh.dagger.DB;
 import com.gentics.mesh.dagger.MeshInternal;
 import com.gentics.mesh.graphdb.spi.Database;
@@ -23,7 +21,7 @@ import com.syncleus.ferma.tx.Tx;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 
-public class ReleaseMigrationJobImpl extends JobImpl {
+public class ReleaseMigrationJobImpl extends AbstractNodeMigrationJobImpl {
 
 	private static final Logger log = LoggerFactory.getLogger(ReleaseMigrationJobImpl.class);
 
@@ -49,7 +47,7 @@ public class ReleaseMigrationJobImpl extends JobImpl {
 
 	@Override
 	protected void processTask() {
-		MigrationStatusHandler status = new MigrationStatusHandlerImpl(this, Mesh.vertx(), MigrationType.release);
+		JobStatusHandler status = new JobStatusHandlerImpl(this, Mesh.vertx());
 		try {
 
 			if (log.isDebugEnabled()) {

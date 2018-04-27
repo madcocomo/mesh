@@ -1,7 +1,7 @@
 package com.gentics.mesh.test.context;
 
 import static com.gentics.mesh.Events.JOB_WORKER_ADDRESS;
-import static com.gentics.mesh.core.rest.admin.migration.MigrationStatus.COMPLETED;
+import static com.gentics.mesh.core.rest.job.JobStatus.COMPLETED;
 import static com.gentics.mesh.test.ClientHelper.call;
 import static com.gentics.mesh.test.TestDataProvider.PROJECT_NAME;
 import static com.gentics.mesh.test.util.TestUtils.sleep;
@@ -31,9 +31,9 @@ import com.gentics.mesh.core.data.node.Node;
 import com.gentics.mesh.core.data.relationship.GraphPermission;
 import com.gentics.mesh.core.data.search.IndexHandler;
 import com.gentics.mesh.core.rest.admin.consistency.ConsistencyCheckResponse;
-import com.gentics.mesh.core.rest.admin.migration.MigrationStatus;
 import com.gentics.mesh.core.rest.job.JobListResponse;
 import com.gentics.mesh.core.rest.job.JobResponse;
+import com.gentics.mesh.core.rest.job.JobStatus;
 import com.gentics.mesh.core.rest.node.NodeResponse;
 import com.gentics.mesh.core.verticle.admin.consistency.ConsistencyCheck;
 import com.gentics.mesh.core.verticle.admin.consistency.ConsistencyCheckHandler;
@@ -198,7 +198,7 @@ public abstract class AbstractMeshTest implements TestHelperMethods, TestHttpMet
 	 *            Amount of expected jobs
 	 * @return Migration status
 	 */
-	protected JobListResponse waitForJobs(Runnable action, MigrationStatus status, int expectedJobs) {
+	protected JobListResponse waitForJobs(Runnable action, JobStatus status, int expectedJobs) {
 		// Load a status just before the action
 		JobListResponse before = call(() -> client().findJobs());
 
@@ -242,7 +242,7 @@ public abstract class AbstractMeshTest implements TestHelperMethods, TestHttpMet
 	 *            Expected job status
 	 * @return Job status
 	 */
-	protected JobResponse waitForJob(Runnable action, String jobUuid, MigrationStatus status) {
+	protected JobResponse waitForJob(Runnable action, String jobUuid, JobStatus status) {
 		// Invoke the action
 		action.run();
 
@@ -289,14 +289,14 @@ public abstract class AbstractMeshTest implements TestHelperMethods, TestHttpMet
 	 * @param status
 	 *            Expected status for all jobs
 	 */
-	protected JobListResponse triggerAndWaitForJob(String jobUuid, MigrationStatus status) {
+	protected JobListResponse triggerAndWaitForJob(String jobUuid, JobStatus status) {
 		waitForJob(() -> {
 			vertx().eventBus().send(JOB_WORKER_ADDRESS, null);
 		}, jobUuid, status);
 		return call(() -> client().findJobs());
 	}
 
-	protected void triggerAndWaitForAllJobs(MigrationStatus expectedStatus) {
+	protected void triggerAndWaitForAllJobs(JobStatus expectedStatus) {
 		vertx().eventBus().send(JOB_WORKER_ADDRESS, null);
 
 		// Now poll the migration status and check the response

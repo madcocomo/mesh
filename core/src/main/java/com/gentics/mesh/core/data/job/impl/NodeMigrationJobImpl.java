@@ -10,14 +10,12 @@ import com.gentics.mesh.core.data.NodeGraphFieldContainer;
 import com.gentics.mesh.core.data.Project;
 import com.gentics.mesh.core.data.Release;
 import com.gentics.mesh.core.data.generic.MeshVertexImpl;
+import com.gentics.mesh.core.data.job.JobStatusHandler;
 import com.gentics.mesh.core.data.release.ReleaseSchemaEdge;
 import com.gentics.mesh.core.data.schema.SchemaContainer;
 import com.gentics.mesh.core.data.schema.SchemaContainerVersion;
 import com.gentics.mesh.core.data.search.SearchQueueBatch;
-import com.gentics.mesh.core.rest.admin.migration.MigrationType;
 import com.gentics.mesh.core.rest.schema.SchemaModel;
-import com.gentics.mesh.core.verticle.migration.MigrationStatusHandler;
-import com.gentics.mesh.core.verticle.migration.impl.MigrationStatusHandlerImpl;
 import com.gentics.mesh.dagger.DB;
 import com.gentics.mesh.dagger.MeshInternal;
 import com.gentics.mesh.graphdb.spi.Database;
@@ -26,7 +24,7 @@ import com.syncleus.ferma.tx.Tx;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
 
-public class NodeMigrationJobImpl extends JobImpl {
+public class NodeMigrationJobImpl extends AbstractNodeMigrationJobImpl {
 
 	private static final Logger log = LoggerFactory.getLogger(NodeMigrationJobImpl.class);
 
@@ -52,7 +50,7 @@ public class NodeMigrationJobImpl extends JobImpl {
 	}
 
 	protected void processTask() {
-		MigrationStatusHandler status = new MigrationStatusHandlerImpl(this, Mesh.vertx(), MigrationType.schema);
+		JobStatusHandler status = new JobStatusHandlerImpl(this, Mesh.vertx());
 		try {
 
 			try (Tx tx = DB.get().tx()) {
@@ -127,8 +125,7 @@ public class NodeMigrationJobImpl extends JobImpl {
 				.deleteIndex(NodeGraphFieldContainer.composeIndexName(project.getUuid(), release.getUuid(), fromContainerVersion.getUuid(), DRAFT))
 				.blockingAwait();
 		MeshInternal.get().searchProvider()
-				.deleteIndex(
-						NodeGraphFieldContainer.composeIndexName(project.getUuid(), release.getUuid(), fromContainerVersion.getUuid(), PUBLISHED))
+				.deleteIndex(NodeGraphFieldContainer.composeIndexName(project.getUuid(), release.getUuid(), fromContainerVersion.getUuid(), PUBLISHED))
 				.blockingAwait();
 
 	}

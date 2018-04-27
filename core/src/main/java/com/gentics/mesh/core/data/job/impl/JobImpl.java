@@ -1,11 +1,9 @@
 package com.gentics.mesh.core.data.job.impl;
 
 import static com.gentics.mesh.core.data.relationship.GraphRelationships.HAS_CREATOR;
-import static com.gentics.mesh.core.data.relationship.GraphRelationships.HAS_FROM_VERSION;
 import static com.gentics.mesh.core.data.relationship.GraphRelationships.HAS_RELEASE;
-import static com.gentics.mesh.core.data.relationship.GraphRelationships.HAS_TO_VERSION;
-import static com.gentics.mesh.core.rest.admin.migration.MigrationStatus.STARTING;
-import static com.gentics.mesh.core.rest.admin.migration.MigrationStatus.UNKNOWN;
+import static com.gentics.mesh.core.rest.job.JobStatus.STARTING;
+import static com.gentics.mesh.core.rest.job.JobStatus.UNKNOWN;
 
 import java.util.Map;
 
@@ -16,20 +14,13 @@ import com.gentics.mesh.context.InternalActionContext;
 import com.gentics.mesh.core.TypeInfo;
 import com.gentics.mesh.core.data.Release;
 import com.gentics.mesh.core.data.User;
-import com.gentics.mesh.core.data.container.impl.MicroschemaContainerVersionImpl;
 import com.gentics.mesh.core.data.generic.AbstractMeshCoreVertex;
 import com.gentics.mesh.core.data.impl.ReleaseImpl;
 import com.gentics.mesh.core.data.impl.UserImpl;
 import com.gentics.mesh.core.data.job.Job;
-import com.gentics.mesh.core.data.schema.MicroschemaContainer;
-import com.gentics.mesh.core.data.schema.MicroschemaContainerVersion;
-import com.gentics.mesh.core.data.schema.SchemaContainer;
-import com.gentics.mesh.core.data.schema.SchemaContainerVersion;
-import com.gentics.mesh.core.data.schema.impl.SchemaContainerVersionImpl;
 import com.gentics.mesh.core.data.search.SearchQueueBatch;
-import com.gentics.mesh.core.rest.admin.migration.MigrationStatus;
-import com.gentics.mesh.core.rest.admin.migration.MigrationType;
 import com.gentics.mesh.core.rest.job.JobResponse;
+import com.gentics.mesh.core.rest.job.JobStatus;
 import com.gentics.mesh.dagger.DB;
 import com.gentics.mesh.util.ETag;
 
@@ -88,20 +79,6 @@ public abstract class JobImpl extends AbstractMeshCoreVertex<JobResponse, Job> i
 		props.put("releaseName", getRelease().getName());
 		props.put("releaseUuid", getRelease().getUuid());
 
-		if (getToSchemaVersion() != null) {
-			SchemaContainer container = getToSchemaVersion().getSchemaContainer();
-			props.put("schemaName", container.getName());
-			props.put("schemaUuid", container.getUuid());
-			props.put("fromVersion", getFromSchemaVersion().getVersion());
-			props.put("toVersion", getToSchemaVersion().getVersion());
-		}
-		if (getToMicroschemaVersion() != null) {
-			MicroschemaContainer container = getToMicroschemaVersion().getSchemaContainer();
-			props.put("microschemaName", container.getName());
-			props.put("microschemaUuid", container.getUuid());
-			props.put("fromVersion", getFromMicroschemaVersion().getVersion());
-			props.put("toVersion", getToMicroschemaVersion().getVersion());
-		}
 		return response;
 	}
 
@@ -111,18 +88,13 @@ public abstract class JobImpl extends AbstractMeshCoreVertex<JobResponse, Job> i
 	}
 
 	@Override
-	public void setType(MigrationType type) {
-		setProperty(TYPE_PROPERTY_KEY, type.name());
+	public void setType(String type) {
+		setProperty(TYPE_PROPERTY_KEY, type);
 	}
 
 	@Override
-	public MigrationType getType() {
-		String type = getProperty(TYPE_PROPERTY_KEY);
-		if (type == null) {
-			return null;
-		} else {
-			return MigrationType.valueOf(type);
-		}
+	public String getType() {
+		return getProperty(TYPE_PROPERTY_KEY);
 	}
 
 	@Override
@@ -167,61 +139,21 @@ public abstract class JobImpl extends AbstractMeshCoreVertex<JobResponse, Job> i
 	}
 
 	@Override
-	public SchemaContainerVersion getFromSchemaVersion() {
-		return out(HAS_FROM_VERSION).has(SchemaContainerVersionImpl.class).nextOrDefaultExplicit(SchemaContainerVersionImpl.class, null);
-	}
-
-	@Override
-	public void setFromSchemaVersion(SchemaContainerVersion version) {
-		setUniqueLinkOutTo(version, HAS_FROM_VERSION);
-	}
-
-	@Override
-	public SchemaContainerVersion getToSchemaVersion() {
-		return out(HAS_TO_VERSION).has(SchemaContainerVersionImpl.class).nextOrDefaultExplicit(SchemaContainerVersionImpl.class, null);
-	}
-
-	@Override
-	public void setToSchemaVersion(SchemaContainerVersion version) {
-		setUniqueLinkOutTo(version, HAS_TO_VERSION);
-	}
-
-	@Override
-	public MicroschemaContainerVersion getFromMicroschemaVersion() {
-		return out(HAS_FROM_VERSION).has(MicroschemaContainerVersionImpl.class).nextOrDefaultExplicit(MicroschemaContainerVersionImpl.class, null);
-	}
-
-	@Override
-	public void setFromMicroschemaVersion(MicroschemaContainerVersion fromVersion) {
-		setUniqueLinkOutTo(fromVersion, HAS_FROM_VERSION);
-	}
-
-	@Override
-	public MicroschemaContainerVersion getToMicroschemaVersion() {
-		return out(HAS_TO_VERSION).has(MicroschemaContainerVersionImpl.class).nextOrDefaultExplicit(MicroschemaContainerVersionImpl.class, null);
-	}
-
-	@Override
-	public void setToMicroschemaVersion(MicroschemaContainerVersion toVersion) {
-		setUniqueLinkOutTo(toVersion, HAS_TO_VERSION);
-	}
-
-	@Override
 	public void delete(SearchQueueBatch batch) {
 		remove();
 	}
 
 	@Override
-	public MigrationStatus getStatus() {
+	public JobStatus getStatus() {
 		String status = getProperty(STATUS_PROPERTY_KEY);
 		if (status == null) {
 			return UNKNOWN;
 		}
-		return MigrationStatus.valueOf(status);
+		return JobStatus.valueOf(status);
 	}
 
 	@Override
-	public void setStatus(MigrationStatus status) {
+	public void setStatus(JobStatus status) {
 		setProperty(STATUS_PROPERTY_KEY, status.name());
 	}
 
@@ -271,7 +203,7 @@ public abstract class JobImpl extends AbstractMeshCoreVertex<JobResponse, Job> i
 		setStopTimestamp(null);
 		setErrorDetail(null);
 		setErrorMessage(null);
-		setStatus(MigrationStatus.QUEUED);
+		setStatus(JobStatus.QUEUED);
 	}
 
 	@Override
@@ -281,7 +213,7 @@ public abstract class JobImpl extends AbstractMeshCoreVertex<JobResponse, Job> i
 
 	@Override
 	public void process() {
-		log.info("Processing job {" + getUuid() + "}");
+		log.info("Processing job {} of type {}", getUuid(), getType());
 		DB.get().tx(() -> {
 			setStartTimestamp();
 			setStatus(STARTING);

@@ -1,19 +1,19 @@
-package com.gentics.mesh.core.verticle.migration;
+package com.gentics.mesh.core.data.job;
 
 import com.gentics.mesh.core.data.release.ReleaseVersionEdge;
-import com.gentics.mesh.core.rest.admin.migration.MigrationStatus;
+import com.gentics.mesh.core.rest.job.JobStatus;
 
 /**
- * Interface for migration status of node, release and micronode migrations.
+ * Callbacks for jobs.
  */
-public interface MigrationStatusHandler {
+public interface JobStatusHandler {
 
 	/**
 	 * Update the status and store it in the local or cluster wide map.
 	 * 
 	 * @return Fluent API
 	 */
-	MigrationStatusHandler commit();
+	JobStatusHandler commit();
 
 	/**
 	 * Update status and inform all the channels.
@@ -21,7 +21,7 @@ public interface MigrationStatusHandler {
 	 * @return Fluent API
 	 */
 
-	MigrationStatusHandler done();
+	JobStatusHandler done();
 
 	/**
 	 * Handle the error and inform all channels.
@@ -30,7 +30,7 @@ public interface MigrationStatusHandler {
 	 * @param string
 	 * @return Fluent API
 	 */
-	MigrationStatusHandler error(Throwable error, String string);
+	JobStatusHandler error(Throwable error, String string);
 
 	/**
 	 * Set the version edge which will store the migration status.
@@ -44,7 +44,7 @@ public interface MigrationStatusHandler {
 	 * 
 	 * @param status
 	 */
-	void setStatus(MigrationStatus status);
+	void setStatus(JobStatus status);
 
 	/**
 	 * Set the current completion count.

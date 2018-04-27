@@ -1,7 +1,7 @@
 package com.gentics.mesh.core.release;
 
-import static com.gentics.mesh.core.rest.admin.migration.MigrationStatus.COMPLETED;
-import static com.gentics.mesh.core.rest.admin.migration.MigrationStatus.FAILED;
+import static com.gentics.mesh.core.rest.job.JobStatus.COMPLETED;
+import static com.gentics.mesh.core.rest.job.JobStatus.FAILED;
 import static com.gentics.mesh.test.ClientHelper.call;
 import static com.gentics.mesh.test.TestDataProvider.PROJECT_NAME;
 import static com.gentics.mesh.test.TestSize.FULL;
@@ -27,8 +27,8 @@ import com.gentics.mesh.core.data.ContainerType;
 import com.gentics.mesh.core.data.Project;
 import com.gentics.mesh.core.data.Release;
 import com.gentics.mesh.core.data.node.Node;
-import com.gentics.mesh.core.rest.admin.migration.MigrationStatus;
 import com.gentics.mesh.core.rest.job.JobListResponse;
+import com.gentics.mesh.core.rest.job.JobStatus;
 import com.gentics.mesh.core.rest.node.NodeCreateRequest;
 import com.gentics.mesh.core.rest.schema.impl.SchemaReferenceImpl;
 import com.gentics.mesh.parameter.impl.PublishParametersImpl;
@@ -140,7 +140,7 @@ public class ReleaseMigrationEndpointTest extends AbstractMeshTest {
 		// The second job should fail because the release has already been migrated.
 		String jobUuidB = requestReleaseMigration(newRelease);
 		JobListResponse response = triggerAndWaitForJob(jobUuidB, FAILED);
-		List<MigrationStatus> status = response.getData().stream().map(e -> e.getStatus()).collect(Collectors.toList());
+		List<JobStatus> status = response.getData().stream().map(e -> e.getStatus()).collect(Collectors.toList());
 		assertThat(status).contains(COMPLETED, FAILED);
 
 	}
@@ -161,7 +161,7 @@ public class ReleaseMigrationEndpointTest extends AbstractMeshTest {
 			triggerAndWaitForJob(requestReleaseMigration(newestRelease), FAILED);
 
 			JobListResponse response = triggerAndWaitForJob(requestReleaseMigration(newRelease), COMPLETED);
-			List<MigrationStatus> status = response.getData().stream().map(e -> e.getStatus()).collect(Collectors.toList());
+			List<JobStatus> status = response.getData().stream().map(e -> e.getStatus()).collect(Collectors.toList());
 			assertThat(status).contains(FAILED, COMPLETED);
 
 			response = triggerAndWaitForJob(requestReleaseMigration(newestRelease), COMPLETED);

@@ -4,11 +4,8 @@ import com.gentics.mesh.Mesh;
 import com.gentics.mesh.core.data.CreatorTrackingVertex;
 import com.gentics.mesh.core.data.MeshCoreVertex;
 import com.gentics.mesh.core.data.Release;
-import com.gentics.mesh.core.data.schema.MicroschemaContainerVersion;
-import com.gentics.mesh.core.data.schema.SchemaContainerVersion;
-import com.gentics.mesh.core.rest.admin.migration.MigrationStatus;
-import com.gentics.mesh.core.rest.admin.migration.MigrationType;
 import com.gentics.mesh.core.rest.job.JobResponse;
+import com.gentics.mesh.core.rest.job.JobStatus;
 import com.gentics.mesh.util.DateUtils;
 
 /**
@@ -42,14 +39,14 @@ public interface Job extends MeshCoreVertex<JobResponse, Job>, CreatorTrackingVe
 	 * 
 	 * @return
 	 */
-	MigrationType getType();
+	String getType();
 
 	/**
 	 * Set the job type.
 	 * 
 	 * @param schema
 	 */
-	void setType(MigrationType type);
+	void setType(String type);
 
 	/**
 	 * Return the release reference for the job.
@@ -64,62 +61,6 @@ public interface Job extends MeshCoreVertex<JobResponse, Job>, CreatorTrackingVe
 	 * @param release
 	 */
 	void setRelease(Release release);
-
-	/**
-	 * Return the schema version reference.
-	 * 
-	 * @return
-	 */
-	SchemaContainerVersion getFromSchemaVersion();
-
-	/**
-	 * Set the schema version reference.
-	 * 
-	 * @param version
-	 */
-	void setFromSchemaVersion(SchemaContainerVersion version);
-
-	/**
-	 * Return the schema version reference.
-	 * 
-	 * @return
-	 */
-	SchemaContainerVersion getToSchemaVersion();
-
-	/**
-	 * Set the schema version reference.
-	 * 
-	 * @param version
-	 */
-	void setToSchemaVersion(SchemaContainerVersion version);
-
-	/**
-	 * Return the microschema version reference.
-	 * 
-	 * @return
-	 */
-	MicroschemaContainerVersion getFromMicroschemaVersion();
-
-	/**
-	 * Set the microschema version reference.
-	 * 
-	 * @param fromVersion
-	 */
-	void setFromMicroschemaVersion(MicroschemaContainerVersion fromVersion);
-
-	/**
-	 * Return the microschema version reference.
-	 * 
-	 * @return
-	 */
-	MicroschemaContainerVersion getToMicroschemaVersion();
-
-	/**
-	 * Set the microschema version reference.
-	 * 
-	 * @param toVersion
-	 */
-	void setToMicroschemaVersion(MicroschemaContainerVersion toVersion);
 
 	/**
 	 * Prepare the job.
@@ -267,14 +208,14 @@ public interface Job extends MeshCoreVertex<JobResponse, Job>, CreatorTrackingVe
 	 * 
 	 * @return
 	 */
-	MigrationStatus getStatus();
+	JobStatus getStatus();
 
 	/**
 	 * Set migration status.
 	 * 
 	 * @param status
 	 */
-	void setStatus(MigrationStatus status);
+	void setStatus(JobStatus status);
 
 	/**
 	 * Return the name of the node on which the job is being executed.
