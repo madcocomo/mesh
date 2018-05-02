@@ -12,6 +12,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -122,15 +123,26 @@ public class XmlFieldHandler extends AbstractHandler {
 		InternalActionContext ac = new InternalRoutingActionContextImpl(rc);
 		validateParameter(nodeUuid, "uuid");
 		validateParameter(fieldName, "fieldName");
-		validateParameter(language, "languange");
-		validateParameter(version, "version");
 		
 		final Path uploadFile = extractUploadFile(rc);
 		log.info("Updating the XML field '{}' of node {}", fieldName, nodeUuid);
 		
 		db.tx(() -> {
 			Project project = ac.getProject();
-			Language languageObj = boot.get().languageRoot().findByLanguageTag(language);
+			Language languageObj = null;
+			if (language != null) {
+				// Load assigned language.
+				languageObj = boot.get().languageRoot().findByLanguageTag(language);
+			} else {
+				// Load default language.
+				List<? extends Language> languageObjList = project.getLanguages();
+				if (languageObjList != null && languageObjList.isEmpty()) {
+					languageObj = languageObjList.get(0);
+				}
+			}
+			if (languageObj == null) {
+				throw error(BAD_REQUEST, "error_language_not_set");
+			}
 			Release releaseObj = ac.getRelease();
 			Node node = project.getNodeRoot().loadObjectByUuid(ac, nodeUuid, UPDATE_PERM);
 			NodeGraphFieldContainer latestDraftVersion = node.getGraphFieldContainer(languageObj, releaseObj, ContainerType.DRAFT);

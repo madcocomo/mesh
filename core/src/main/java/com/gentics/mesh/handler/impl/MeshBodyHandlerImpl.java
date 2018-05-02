@@ -42,27 +42,32 @@ public class MeshBodyHandlerImpl extends BodyHandlerImpl {
 		// Use original behavior except for POST/PUT-ing XML and Zip content.
 		HttpMethod method = request.method();
 		if(method != HttpMethod.POST && method != HttpMethod.PUT) {
-            super.handle(context);
-            return;
+			super.handle(context);
+			return;
 		}
-		
-		String contentType = request.getHeader(HttpHeaders.CONTENT_TYPE);
-		if(null != contentType && !"text/xml".equals(contentType) && !"application/xml".equals(contentType) && !"application/zip".equals(contentType)) {
-            super.handle(context);
-            return;
-		}
-		
-		log.info("Using special request body handling for file upload of type {}", contentType);
 		
 		// !!! UBER DIRTY HACK INBOUND !!!
 		// For POST/PUT-ing XML and Zip files, write the request body to the upload folder directly 
 		// instead of using the built-in vert.x body handler behavior (i.e. in-memory buffer).
 		// This also circumvents the "max upload size" setting.
+		String contentType = request.getHeader(HttpHeaders.CONTENT_TYPE);
+		if (null != contentType 
+			&& !"text/xml".equals(contentType) 
+			&& !"application/xml".equals(contentType) 
+			&& !"application/zip".equals(contentType)
+		) {
+			super.handle(context);
+			return;
+		}
+		
+		log.info("Using special request body handling for file upload of type {}", contentType);
+		
 		Path resultFile = Paths.get(uploadsDirectory, UUID.randomUUID().toString());
 		request.handler(buffer -> {
 			try {
 				// Create if missing.
 				if (!Files.exists(resultFile)) {
+					Files.createDirectories(resultFile.getParent());
 					Files.createFile(resultFile);
 				}
 				// Append content of request body buffer to file.
@@ -72,7 +77,7 @@ public class MeshBodyHandlerImpl extends BodyHandlerImpl {
 					}
 				}
 			} catch (IOException e) {
-				throw new RuntimeException(e);
+				throw new RuntimeException("error handling upload", e);
 			}
 		});
 		request.endHandler(v -> {
@@ -81,7 +86,7 @@ public class MeshBodyHandlerImpl extends BodyHandlerImpl {
 			context.next();
 		});
 		
-		// Signal other body handlers (if any) to stop handling this request.
+		// Prevent other body handlers (if any) from handling this request.
 		context.put("__body-handled", Boolean.TRUE);
 	}
 }
