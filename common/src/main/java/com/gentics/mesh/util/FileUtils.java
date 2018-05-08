@@ -3,11 +3,14 @@ package com.gentics.mesh.util;
 import static com.gentics.mesh.core.rest.error.Errors.error;
 import static io.netty.handler.codec.http.HttpResponseStatus.INTERNAL_SERVER_ERROR;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
+
+import com.gentics.mesh.core.rest.error.Errors;
 
 import io.reactivex.Flowable;
 import io.reactivex.Single;
@@ -22,6 +25,20 @@ public final class FileUtils {
 	protected static final char[] hexArray = "0123456789abcdef".toCharArray();
 
 	private FileUtils() {
+	}
+	
+	/**
+	 * Gets the size of the file.
+	 * 
+	 * @param path Path to the file.
+	 * @return Size of file in bytes.
+	 */
+	public static long size(String path) {
+		try {
+			return Files.size(Paths.get(path));
+		} catch (IOException e) {
+			throw Errors.internalError(e, "node_error_upload_failed");
+		}
 	}
 
 	/**

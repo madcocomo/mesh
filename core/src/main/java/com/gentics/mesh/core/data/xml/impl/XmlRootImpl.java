@@ -52,6 +52,7 @@ public class XmlRootImpl extends MeshVertexImpl implements XmlRoot {
 	@Override
 	public Xml createItem() {
 		Xml xml = getGraph().addFramedVertex(XmlImpl.class);
+		addItem(xml);
 		return xml;
 	}
 	

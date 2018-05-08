@@ -11,6 +11,7 @@ import com.gentics.mesh.core.data.search.SearchQueue;
 import com.gentics.mesh.core.data.service.ServerSchemaStorage;
 import com.gentics.mesh.core.image.spi.ImageManipulator;
 import com.gentics.mesh.core.link.WebRootLinkReplacer;
+import com.gentics.mesh.core.verticle.batch.archiveimport.ArchiveImportHandler;
 import com.gentics.mesh.core.verticle.job.JobWorkerVerticle;
 import com.gentics.mesh.core.verticle.migration.micronode.MicronodeMigrationHandler;
 import com.gentics.mesh.core.verticle.migration.node.NodeMigrationHandler;
@@ -24,8 +25,8 @@ import com.gentics.mesh.graphdb.spi.Database;
 import com.gentics.mesh.rest.MeshLocalClientImpl;
 import com.gentics.mesh.rest.RestAPIVerticle;
 import com.gentics.mesh.router.RouterStorage;
-import com.gentics.mesh.search.TrackingSearchProvider;
 import com.gentics.mesh.search.IndexHandlerRegistry;
+import com.gentics.mesh.search.TrackingSearchProvider;
 import com.gentics.mesh.search.index.group.GroupIndexHandler;
 import com.gentics.mesh.search.index.microschema.MicroschemaContainerIndexHandler;
 import com.gentics.mesh.search.index.node.NodeIndexHandler;
@@ -72,6 +73,8 @@ public interface TestMeshComponent extends MeshComponent {
 	ReleaseMigrationHandler releaseMigrationHandler();
 
 	MicronodeMigrationHandler micronodeMigrationHandler();
+	
+	ArchiveImportHandler archiveImportHandler();
 
 	MeshLocalClientImpl meshLocalClientImpl();
 

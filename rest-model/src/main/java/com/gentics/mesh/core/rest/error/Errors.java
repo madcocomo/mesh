@@ -84,7 +84,7 @@ public enum Errors {
 	public static GenericRestException error(HttpResponseStatus status, String i18nMessageKey, String... parameters) {
 		return new GenericRestException(status, i18nMessageKey, parameters);
 	}
-
+	
 	/**
 	 * Create a i18n translated permission error exception.
 	 * 
@@ -110,7 +110,58 @@ public enum Errors {
 	public static GenericRestException error(HttpResponseStatus status, String i18nMessageKey, Throwable t) {
 		return new GenericRestException(status, i18nMessageKey, t);
 	}
-
+	
+	/**
+	 * Creates a generic i18n translated REST error exception.
+	 * 
+	 * @param status HTTP status.
+	 * @param t The cause exception.
+	 * @param i18nMessageKey Message key (defined in translations_*.properties).
+	 * @param params Parameters for the message.
+	 * 
+	 * @return The created exception.
+	 */
+	public static GenericRestException error(HttpResponseStatus status, Throwable t, String i18nMessageKey, String... params) {
+		return new GenericRestException(status, t, i18nMessageKey, params);
+	}
+	
+	/**
+	 * Creates an i18n REST internal error exception.
+	 * 
+	 * @param message The message as plain text or i18n message key.
+	 * @param parameters Optional message parameters.
+	 * 
+	 * @return The created exception.
+	 */
+	public static GenericRestException internalError(String message, String... parameters) {
+		return error(HttpResponseStatus.INTERNAL_SERVER_ERROR, message, parameters);
+	}
+	
+	/**
+	 * Creates an i18n REST internal error exception.
+	 * 
+	 * @param i18nMessageKey Message key (defined in translations_*.properties).
+	 * @param t The cause exception.
+	 * 
+	 * @return The created exception.
+	 */
+	public static GenericRestException internalError(String i18nMessageKey, Throwable t) {
+		return error(HttpResponseStatus.INTERNAL_SERVER_ERROR, i18nMessageKey, t);
+	}
+	
+	/**
+	 * Creates an i18n REST internal error exception.
+	 * 
+	 * @param t The cause exception.
+	 * @param i18nMessageKey Message key (defined in translations_*.properties).
+	 * @param i18nMessageParams Message parameters.
+	 * 
+	 * @return The created exception.
+	 */
+	public static GenericRestException internalError(Throwable t, String i18nMessageKey, String... i18nMessageParams) {
+		return error(HttpResponseStatus.INTERNAL_SERVER_ERROR, t, i18nMessageKey, i18nMessageParams);
+	}
+	
 	/**
 	 * Resolve the given typeName to a registered type.
 	 * 

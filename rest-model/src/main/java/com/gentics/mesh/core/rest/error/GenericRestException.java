@@ -54,6 +54,10 @@ public class GenericRestException extends AbstractRestException {
 		this.status = status;
 		this.i18nParameters = i18nParameters;
 	}
+	
+	public GenericRestException(HttpResponseStatus status, Throwable e, String i18nMessageKey, String... i18nParameters) {
+		super(status, e, i18nMessageKey, i18nParameters);
+	}
 
 	/**
 	 * Create a new http status exception.

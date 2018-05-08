@@ -179,6 +179,23 @@ public interface RootVertex<T extends MeshCoreVertex<? extends RestModel, T>> ex
 		}
 		return null;
 	}
+	
+	/**
+	 * Find the element with given UUID.
+	 * 
+	 * Unlike {@link findByUuid()} this method throws a REST exception with error 404 if the object by that
+	 * UUID is not found instead of returning null.
+	 * 
+	 * @param uuid UUID of the element.
+	 * @return The found element.
+	 */
+	default T findByUuidFailfast(String uuid) {
+		T t = findByUuid(uuid);
+		if (t == null) {
+			throw error(NOT_FOUND, "object_not_found_for_uuid", uuid);
+		}
+		return t;
+	}
 
 	/**
 	 * Load the object by uuid and check the given permission.

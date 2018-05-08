@@ -71,6 +71,13 @@ public abstract class AbstractRestException extends RuntimeException {
 		this.i18nKey = i18nMessageKey;
 		this.i18nParameters = i18nParameters;
 	}
+	
+	public AbstractRestException(HttpResponseStatus status, Throwable e, String i18nMessageKey, String... i18nParameters) {
+		super(i18nMessageKey, e);
+		this.status = status;
+		this.i18nKey = i18nMessageKey;
+		this.i18nParameters = i18nParameters;
+	}
 
 	/**
 	 * Create a new exception.

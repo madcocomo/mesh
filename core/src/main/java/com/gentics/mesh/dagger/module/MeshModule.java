@@ -6,6 +6,7 @@ import javax.inject.Singleton;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.gentics.mesh.Mesh;
+import com.gentics.mesh.core.csdb.NodePopulatorService;
 import com.gentics.mesh.core.data.search.SearchQueue;
 import com.gentics.mesh.core.data.search.SearchQueueBatch;
 import com.gentics.mesh.core.data.search.impl.SearchQueueImpl;
@@ -65,6 +66,12 @@ public class MeshModule {
 	@Singleton
 	public static BinaryStorage binaryStorage() {
 		return storageService().getStorage();
+	}
+	
+	@Provides
+	@Singleton
+	public static NodePopulatorService nodePopulatorService() {
+		return NodePopulatorService.getInstance();
 	}
 
 	@Provides

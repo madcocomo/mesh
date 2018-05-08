@@ -129,6 +129,19 @@ public interface Project extends MeshCoreVertex<ProjectResponse, Project>, Refer
 	 * @param language
 	 */
 	void addLanguage(Language language);
+	
+	/**
+	 * Gets the project language by that name.
+	 * 
+	 * @param languageTag Name of the language.
+	 * 
+	 * @return The project language or null.
+	 */
+	default Language getLanguage(String languageTag) {
+		return getLanguages().stream()
+			.filter(l -> languageTag.equalsIgnoreCase(l.getName()))
+			.findFirst().orElse(null);
+	}
 
 	/**
 	 * Return the node root aggregation vertex of the project. Internally this method will create the node root when it has not yet been created.

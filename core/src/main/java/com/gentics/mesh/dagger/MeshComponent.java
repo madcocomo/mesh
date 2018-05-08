@@ -7,11 +7,13 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.gentics.mesh.auth.MeshAuthHandler;
 import com.gentics.mesh.cli.BootstrapInitializer;
+import com.gentics.mesh.core.csdb.NodePopulatorService;
 import com.gentics.mesh.core.data.schema.handler.SchemaComparator;
 import com.gentics.mesh.core.data.search.SearchQueue;
 import com.gentics.mesh.core.data.service.ServerSchemaStorage;
 import com.gentics.mesh.core.image.spi.ImageManipulator;
 import com.gentics.mesh.core.link.WebRootLinkReplacer;
+import com.gentics.mesh.core.verticle.batch.archiveimport.ArchiveImportHandler;
 import com.gentics.mesh.core.verticle.job.JobWorkerVerticle;
 import com.gentics.mesh.core.verticle.migration.micronode.MicronodeMigrationHandler;
 import com.gentics.mesh.core.verticle.migration.node.NodeMigrationHandler;
@@ -64,6 +66,8 @@ public interface MeshComponent {
 	Provider<RouterStorage> routerStorageProvider();
 
 	BinaryStorage binaryStorage();
+	
+	NodePopulatorService nodePopulatorService();
 
 	default TrackingSearchProvider trackingSearchProvider() {
 		return (TrackingSearchProvider) searchProvider();
@@ -82,6 +86,8 @@ public interface MeshComponent {
 	ReleaseMigrationHandler releaseMigrationHandler();
 
 	MicronodeMigrationHandler micronodeMigrationHandler();
+	
+	ArchiveImportHandler archiveImportHandler();
 
 	MeshLocalClientImpl meshLocalClientImpl();
 

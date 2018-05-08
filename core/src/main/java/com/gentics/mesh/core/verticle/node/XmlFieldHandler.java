@@ -16,7 +16,6 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import com.gentics.mesh.Mesh;
 import com.gentics.mesh.cli.BootstrapInitializer;
 import com.gentics.mesh.context.InternalActionContext;
 import com.gentics.mesh.context.impl.InternalRoutingActionContextImpl;
@@ -30,22 +29,17 @@ import com.gentics.mesh.core.data.node.field.XmlGraphField;
 import com.gentics.mesh.core.data.search.SearchQueue;
 import com.gentics.mesh.core.data.search.SearchQueueBatch;
 import com.gentics.mesh.core.data.xml.Xml;
-import com.gentics.mesh.core.data.xml.XmlRoot;
 import com.gentics.mesh.core.rest.schema.FieldSchema;
 import com.gentics.mesh.core.rest.schema.XmlFieldSchema;
 import com.gentics.mesh.core.verticle.handler.AbstractHandler;
+import com.gentics.mesh.dagger.MeshInternal;
 import com.gentics.mesh.graphdb.spi.Database;
 import com.gentics.mesh.http.MeshHeaders;
 import com.gentics.mesh.storage.BinaryStorage;
-import com.gentics.mesh.util.FileUtils;
-import com.gentics.mesh.util.RxUtil;
 
 import dagger.Lazy;
 import io.netty.handler.codec.http.HttpResponseStatus;
-import io.reactivex.Flowable;
 import io.vertx.core.buffer.Buffer;
-import io.vertx.core.file.AsyncFile;
-import io.vertx.core.file.OpenOptions;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.logging.Logger;
@@ -164,36 +158,10 @@ public class XmlFieldHandler extends AbstractHandler {
 			// Create a new draft version for the node.
 			NodeGraphFieldContainer newDraftVersion = node.createGraphFieldContainer(languageObj, releaseObj, ac.getUser(), latestDraftVersion, true);
 			
-			// TODO Handle automatic save triggers, e.g. schema detection and stuff.
+			// Let the populator do its magic /s.
+			MeshInternal.get().nodePopulatorService().populateNode(uploadFile, newDraftVersion);
 			
-			XmlRoot xmlRoot = boot.get().meshRoot().getXmlRoot();
-			Xml xml = xmlRoot.createItem();
-			xml.setSize(Files.size(uploadFile));
-			xml.setChecksum(FileUtils.hash(uploadFile.toString()));
-			xml.setSchemaName("descript.xsd"); // XXX
-			xml.setSchemaVariantName("S1000D-4.2-AIB"); // XXX
-			log.info("Created XML content container {}", xml.getUuid());
-			
-			// Remove old graph field.
-			XmlGraphField oldXmlGraphField = newDraftVersion.getXml(fieldName);
-			if (oldXmlGraphField != null) {
-				final String oldXmlGraphFieldUuid = oldXmlGraphField.getUuid();
-				oldXmlGraphField.removeField(newDraftVersion);
-				log.info("Removed old XML graph field {}", oldXmlGraphFieldUuid);
-			}
-			// Add new graph field.
-			XmlGraphField newXmlGraphField = newDraftVersion.createXml(fieldName, xml);
-			newXmlGraphField.setFilename("DMC-A350-A-00-62-07-11001-018A-D"); // XXX
-			log.info("Added new XML graph field {}", newXmlGraphField.getUuid());
-			
-			// Store the file in binary storage.
-			AsyncFile asyncFile = Mesh.vertx().fileSystem().openBlocking(uploadFile.toString(), new OpenOptions());
-			Flowable<Buffer> stream = RxUtil.toBufferFlow(asyncFile);
-			binaryStorage.store(stream, xml.getUuid()).doOnComplete(() -> {
-				Files.delete(uploadFile);
-				log.info("Persisted XML content to binary storage {} from file {}", xml.getUuid(), uploadFile);
-			}).blockingAwait();
-			
+			// Submit a search index update query.
 			SearchQueueBatch batch = searchQueue.create();
 			return batch.store(node, releaseObj.getUuid(), DRAFT, false)
 				.processAsync()
@@ -216,7 +184,7 @@ public class XmlFieldHandler extends AbstractHandler {
 				}
 				return tempFile;
 			} catch (IOException e) {
-				throw new RuntimeException("lolwut", e);
+				throw new RuntimeException("error saving upload file to " + filePath, e);
 			}
 		} else {
 			return Paths.get(filePath);

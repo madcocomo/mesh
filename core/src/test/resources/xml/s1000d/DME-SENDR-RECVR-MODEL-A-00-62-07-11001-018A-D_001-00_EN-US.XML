@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dmodule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.s1000d.org/S1000D_4-2/xml_schema_flat/descript.xsd">
+<identAndStatusSection>
+<dmAddress>
+<dmIdent>
+<identExtension extensionCode="RECVR" extensionProducer="SENDR"/>
+<dmCode assyCode="07" disassyCode="11" disassyCodeVariant="001" infoCode="018" infoCodeVariant="A" itemLocationCode="D" modelIdentCode="MODEL" subSubSystemCode="2" subSystemCode="6" systemCode="00" systemDiffCode="A"/>
+<language countryIsoCode="US" languageIsoCode="en"/>
+<issueInfo inWork="00" issueNumber="002"/>
+</dmIdent>
+<dmAddressItems>
+<issueDate day="01" month="11" year="2016"/>
+<dmTitle>
+<techName>Part - Introduction</techName>
+<infoName>Common Information Repository (CIR) Parts/Enterprise - Introduction</infoName>
+</dmTitle>
+</dmAddressItems>
+</dmAddress>
+<dmStatus issueType="changed">
+<security securityClassification="01"/>
+<dataRestrictions>
+<restrictionInstructions>
+<dataDistribution>ACME Air Lines</dataDistribution>
+</restrictionInstructions>
+<restrictionInfo>
+<copyright>
+<copyrightPara>
+</copyrightPara>
+</copyright>
+</restrictionInfo>
+</dataRestrictions>
+<responsiblePartnerCompany enterpriseCode="SENDR"/>
+<originator enterpriseCode="SENDR"/>
+<applicCrossRefTableRef>
+<dmRef>
+<dmRefIdent>
+<dmCode assyCode="00" disassyCode="10" disassyCodeVariant="000" infoCode="00W" infoCodeVariant="A" itemLocationCode="D" modelIdentCode="MODEL" subSubSystemCode="0" subSystemCode="0" systemCode="A0" systemDiffCode="A"/>
+</dmRefIdent>
+</dmRef>
+</applicCrossRefTableRef>
+<brexDmRef>
+<dmRef>
+<dmRefIdent>
+<dmCode assyCode="0301" disassyCode="00" disassyCodeVariant="A" infoCode="022" infoCodeVariant="A" itemLocationCode="D" modelIdentCode="S1000D" subSubSystemCode="0" subSystemCode="1" systemCode="04" systemDiffCode="F"/>
+</dmRefIdent>
+</dmRef>
+</brexDmRef>
+<qualityAssurance>
+<firstVerification verificationType="tabtop"/>
+</qualityAssurance>
+</dmStatus>
+</identAndStatusSection>
+<content>
+<description>
+
+</description>
+</content>
+</dmodule>
